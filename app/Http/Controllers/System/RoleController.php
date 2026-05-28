@@ -3,6 +3,7 @@
  * @copyright (c) 2026 MCortesDev (https://mcortes.dev) - All Rights Reserved
  */
 
+use App\Events\Users\RoleUpdate;
 use App\Http\Controllers\Controller;
 use App\Models\Role;
 use Illuminate\Http\Request;
@@ -43,6 +44,9 @@ class RoleController extends Controller
     public function updatePermissions(Role $role, Request $request)
     {
         $role->syncPermissions($request->input('permissions', []));
+
+        // Notificar a los usuarios que tienen este rol
+        RoleUpdate::dispatch($role);
 
         return ApiResponse::OK->response();
     }
