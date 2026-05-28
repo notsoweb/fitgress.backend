@@ -7,7 +7,12 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ServerController;
 use App\Http\Controllers\UserController as MyUserController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\ChangelogController;
 use App\Http\Controllers\ResourceController;
+use App\Http\Controllers\System\NotificationController;
+use App\Http\Controllers\System\PermissionController;
+use App\Http\Controllers\System\PermissionTypeController;
+use App\Http\Controllers\System\RoleController;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -34,6 +39,7 @@ Route::middleware('auth:api')->group(function () {
         Route::delete('photo', [MyUserController::class, 'destroyPhoto'])->name('photo');
         Route::get('roles', [MyUserController::class, 'roles'])->name('roles');
     });
+
     // Administración
     Route::prefix('admin')->name('admin.')->group(function() {
         Route::prefix('users/{user}')->name('users.')->group(function() {
@@ -45,12 +51,33 @@ Route::middleware('auth:api')->group(function () {
         Route::apiResource('users', UserController::class);
     });
 
+    // Rutas de sistema
+    Route::prefix('system')->name('system.')->group(function() {
+        Route::get('permissions', [PermissionController::class, 'index'])->name('permissions');
+        Route::get('permission-types', [PermissionTypeController::class, 'index'])->name('permission-types');
+        Route::prefix('roles')->name('roles.')->group(function() {
+            Route::get('/', [RoleController::class, 'index'])->name('index');
+        });
+        Route::prefix('notifications')->name('notifications.')->group(function() {
+            Route::get('/', [NotificationController::class, 'index'])->name('index');
+            Route::get('unreaded', [NotificationController::class, 'unreaded'])->name('unreaded');
+            Route::post('read', [NotificationController::class, 'read'])->name('read');
+            Route::post('close', [NotificationController::class, 'close'])->name('close');
+            Route::delete('destroy', [NotificationController::class, 'destroy'])->name('destroy');
+        });
+    });
+
     Route::prefix('auth')->name('auth.')->group(function() {
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
     });
 
-    // Versión del sistema
-    Route::get('/version', [ServerController::class, 'version'])->name('version');
+    Route::prefix('resources')->name('resources.')->group(function() {
+        Route::post('get', [ResourceController::class, 'get'])->name('get');
+    });
+
+    // Información del sistema
+    Route::get('changelogs', ChangelogController::class)->name('changelogs');
+    Route::get('version', [ServerController::class, 'version'])->name('version');
 });
 
 Route::prefix('resources')->name('resources.')->group(function() {
