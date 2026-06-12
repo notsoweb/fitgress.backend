@@ -1,4 +1,7 @@
 <?php namespace App\Notifications;
+/**
+ * @copyright (c) 2026 MCortesDev (https://mcortes.dev) - All Rights Reserved
+ */
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -7,9 +10,9 @@ use Illuminate\Notifications\Notification;
 
 /**
  * Notificación de usuario
- * 
+ *
  * @author Moisés Cortés C. <soy@mcortes.dev>
- * 
+ *
  * @version 1.0.0
  */
 class UserNotification extends Notification implements ShouldQueue

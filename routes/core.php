@@ -71,8 +71,8 @@ Route::middleware('auth:api')->group(function () {
             Route::get('/', [RoleController::class, 'index'])->name('index');
         });
         Route::prefix('notifications')->name('notifications.')->group(function () {
-            Route::get('/', [NotificationController::class, 'index'])->name('index');
-            Route::get('unreaded', [NotificationController::class, 'unreaded'])->name('unreaded');
+            Route::get('all', [NotificationController::class, 'index'])->name('all');
+            Route::get('all-unread', [NotificationController::class, 'allUnread'])->name('all-unread');
             Route::post('read', [NotificationController::class, 'read'])->name('read');
             Route::post('close', [NotificationController::class, 'close'])->name('close');
             Route::delete('destroy', [NotificationController::class, 'destroy'])->name('destroy');
