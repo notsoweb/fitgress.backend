@@ -106,7 +106,7 @@ class AuthController extends Controller
     public function logout()
     {
         return ApiResponse::OK->response([
-            'revoked' => Auth::user()->token()->revoke()
+            'is_revoked' => Auth::user()->token()->revoke()
         ]);
     }
 }
