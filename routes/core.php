@@ -1,4 +1,5 @@
 <?php
+
 /*
  * @copyright (c) 2026 Mdev (https://mcortes.dev) - All rights reserved.
  */
@@ -9,6 +10,7 @@ use App\Http\Controllers\Admin\RoleController as AdminRoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChangelogController;
+use App\Http\Controllers\PasskeyController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\ServerController;
 use App\Http\Controllers\System\NotificationController;
@@ -40,6 +42,13 @@ Route::middleware('auth:api')->group(function () {
         Route::get('permissions', [MyUserController::class, 'permissions'])->name('permissions');
         Route::delete('photo', [MyUserController::class, 'destroyPhoto'])->name('photo');
         Route::get('roles', [MyUserController::class, 'roles'])->name('roles');
+
+        Route::prefix('passkeys')->name('passkeys.')->group(function () {
+            Route::get('/', [PasskeyController::class, 'index'])->name('index');
+            Route::get('register-options', [PasskeyController::class, 'registerOptions'])->name('register-options');
+            Route::post('/', [PasskeyController::class, 'store'])->name('store');
+            Route::delete('{passkey}', [PasskeyController::class, 'destroy'])->name('destroy');
+        });
     });
 
     // Administración
@@ -101,4 +110,9 @@ Route::prefix('auth')->name('auth.')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');
     Route::post('forgot-password', [AuthController::class, 'forgotPassword'])->name('forgot-password');
     Route::post('reset-password', [AuthController::class, 'resetPassword'])->name('reset-password');
+
+    Route::prefix('passkeys')->name('passkeys.')->group(function () {
+        Route::get('authentication-options', [PasskeyController::class, 'authenticationOptions'])->name('authentication-options');
+        Route::post('login', [PasskeyController::class, 'login'])->name('login');
+    });
 });

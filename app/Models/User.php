@@ -17,13 +17,15 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\HasApiTokens;
 use Notsoweb\LaravelCore\Traits\Models\Extended;
+use Spatie\LaravelPasskeys\Models\Concerns\HasPasskeys;
+use Spatie\LaravelPasskeys\Models\Concerns\InteractsWithPasskeys;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
  * Usuarios
- * 
+ *
  * @author Moisés Cortés C. <soy@mcortes.dev>
- * 
+ *
  * @version 1.0.0
  */
 #[Fillable([
@@ -34,22 +36,23 @@ use Spatie\Permission\Traits\HasRoles;
     'email',
     'password',
     'profile_photo_path',
- ])]
+])]
 #[Hidden([
     'password',
     'remember_token',
     'profile_photo_path',
- ])]
+])]
 #[ObservedBy([
     UserObserver::class,
- ])]
-class User extends Authenticatable
+])]
+class User extends Authenticatable implements HasPasskeys
 {
     use Extended,
         HasApiTokens,
         HasFactory,
         HasProfilePhoto,
         HasRoles,
+        InteractsWithPasskeys,
         Notifiable,
         // MustVerifyEmail,
         SoftDeletes;
@@ -67,8 +70,8 @@ class User extends Authenticatable
         ];
     }
 
-    # Atributos virtuales
-    
+    // Atributos virtuales
+
     /**
      * Atributos que se deben agregar al modelo en su forma de array
      */
@@ -77,7 +80,7 @@ class User extends Authenticatable
         'last_name',
         'profile_photo_url',
     ];
-    
+
     /**
      * Nombre completo
      */
@@ -98,9 +101,9 @@ class User extends Authenticatable
         );
     }
 
-    # Relaciones
+    // Relaciones
 
-     /**
+    /**
      * Eventos realizados sobre usuarios
      */
     public function events()
@@ -110,7 +113,7 @@ class User extends Authenticatable
 
     /**
      * Un usuario puede generar muchos eventos
-     * 
+     *
      * Son los eventos que genera el usuario en el sistema.
      */
     public function history()
@@ -126,7 +129,7 @@ class User extends Authenticatable
         return $this->hasMany(PasswordResetToken::class);
     }
 
-    # Acciones
+    // Acciones
 
     /**
      * Eliminar token de reseteo de contraseña
@@ -142,7 +145,7 @@ class User extends Authenticatable
     public function forcePassword(string $password): void
     {
         $this->update([
-            'password' => bcrypt($password)
+            'password' => bcrypt($password),
         ]);
     }
 
@@ -151,7 +154,7 @@ class User extends Authenticatable
      */
     public function generatePasswordResetToken(): string
     {
-        if($this->passwordResetTokens()->exists()){
+        if ($this->passwordResetTokens()->exists()) {
             $this->passwordResetTokens()->delete();
         }
 
