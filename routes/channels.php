@@ -13,7 +13,7 @@ Broadcast::channel('App.Models.Role.{id}', function ($user, $id) {
 });
 
 // Usuarios en linea
-Broadcast::channel('online', function ($user) {
+Broadcast::channel('Online', function ($user) {
     return $user;
 });
 

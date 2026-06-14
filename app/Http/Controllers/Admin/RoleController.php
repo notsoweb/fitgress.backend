@@ -3,7 +3,7 @@
  * @copyright (c) 2026 MCortesDev (https://mcortes.dev) - All Rights Reserved
  */
 
-use App\Events\Users\RoleUpdate;
+use App\Events\Roles\PermissionUpdate;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Roles\RoleStoreRequest;
 use App\Http\Requests\Roles\RoleUpdateRequest;
@@ -117,7 +117,7 @@ class RoleController extends Controller implements HasMiddleware
     {
         $role->syncPermissions($request->input('permissions', []));
 
-        RoleUpdate::dispatch($role);
+        PermissionUpdate::dispatch($role);
 
         return ApiResponse::OK->response();
     }

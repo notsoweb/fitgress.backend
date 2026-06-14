@@ -3,34 +3,36 @@
  * @copyright (c) 2026 MCortesDev (https://mcortes.dev) - All Rights Reserved
  */
 
-use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
 /**
- * Actualizar roles de un usuario
- * 
- * Informa al usuario que sus permisos han sido actualizados.
- * 
+ * Evento de notificación global
+ *
  * @author Moisés Cortés C. <soy@mcortes.dev>
- * 
+ *
  * @version 1.0.0
  */
-class RoleUpdate implements ShouldBroadcast
+class GlobalNotification implements ShouldBroadcast
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable,
+        InteractsWithSockets,
+        SerializesModels;
 
     /**
      * Create a new event instance.
      */
     public function __construct(
-        public User $user
-    )
-    {}
+        public string $title,
+        public string $message,
+        public string $type = 'info',
+        public int $timeout = 15
+    ) {}
 
     /**
      * Get the channels the event should broadcast on.
@@ -40,7 +42,7 @@ class RoleUpdate implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel("App.Models.User.{$this->user->id}"),
+            new PrivateChannel('Global'),
         ];
     }
 }

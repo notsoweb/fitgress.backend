@@ -3,6 +3,7 @@
  * @copyright (c) 2026 Mdev (https://mcortes.dev) - All rights reserved.
  */
 
+use App\Events\Users\RoleUpdate;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UserStoreRequest;
 use App\Http\Requests\Admin\UserUpdateRequest;
@@ -139,6 +140,8 @@ class UserController extends Controller
             }
 
             $user->roles()->sync($toSync);
+
+            RoleUpdate::dispatch($user);
         }
 
         return ApiResponse::OK->response();
