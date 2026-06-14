@@ -22,10 +22,10 @@ class ChangelogController extends Controller
     {
         return ApiResponse::OK->response(array_reverse([
             [
-                'version' => '0.9.0',
-                'date' => '2024-12-13',
+                'version' => '0.9.9',
+                'date' => '2026-06-14',
                 'changes' => [
-                    'ADD: Personalización de stubs',
+                    'ADD: Notificaciones en tiempo real.',
                 ]
             ]
         ]));

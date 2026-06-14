@@ -15,9 +15,9 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
-    'slug' => Str::slug(env('APP_NAME', 'laravel')),
-    'version' => '0.0.1',
+    'name' => env('APP_NAME', 'Argos'),
+    'slug' => Str::slug(env('APP_NAME', 'argos')),
+    'version' => '0.9.9',
 
     /*
     |--------------------------------------------------------------------------
