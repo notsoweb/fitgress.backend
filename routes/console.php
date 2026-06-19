@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schedule;
 
 Schedule::command('backup:clean')->daily()->at('01:00');
