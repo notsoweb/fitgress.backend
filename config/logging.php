@@ -132,6 +132,11 @@ return [
             'path' => storage_path('logs/mail.log'),
         ],
 
+        'backups' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/backups.log'),
+        ],
+
     ],
 
 ];
