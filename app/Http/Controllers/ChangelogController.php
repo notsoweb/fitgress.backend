@@ -26,8 +26,17 @@ class ChangelogController extends Controller
                 'date' => '2026-06-14',
                 'changes' => [
                     'ADD: Notificaciones en tiempo real.',
+                ],
+            ],
+            [
+                'version' => '0.9.10',
+                'date' => '2026-06-18',
+                'changes' => [
+                    'ADD: Backup automático y manual del sistema.',
+                    'ADD: Notificación por correo electrónico cuando el backup falla o tiene éxito.',
+                    'ADD: Comando para enviar un correo de prueba.',
                 ]
-            ]
+            ],
         ]));
     }
 }
