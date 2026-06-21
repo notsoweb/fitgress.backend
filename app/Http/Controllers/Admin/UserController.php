@@ -46,7 +46,11 @@ class UserController extends Controller
      */
     public function store(UserStoreRequest $request)
     {
-        User::create($request->validated());
+        $user = User::create($request->validated());
+
+        if ($request->has('roles')) {
+            $user->roles()->sync($request->roles);
+        }
 
         return ApiResponse::OK->response();
     }
