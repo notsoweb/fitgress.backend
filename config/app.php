@@ -17,7 +17,7 @@ return [
 
     'name' => env('APP_NAME', 'Argos'),
     'slug' => Str::slug(env('APP_NAME', 'argos')),
-    'version' => '0.9.10',
+    'version' => '0.9.11',
 
     /*
     |--------------------------------------------------------------------------

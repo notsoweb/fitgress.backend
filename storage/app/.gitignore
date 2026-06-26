@@ -1,5 +1,7 @@
 *
 !backup-tmp/
+!backups/
+!images/
 !keys/
 !private/
 !profile/

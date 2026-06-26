@@ -11,6 +11,8 @@ use Spatie\Backup\Tasks\Cleanup\Strategies\DefaultStrategy;
 use Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays;
 use Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes;
 
+$notificationsRoutes = explode(',', env('BACKUP_NOTIFICATIONS_ROUTES', 'discord'));
+
 return [
 
     'backup' => [
@@ -26,8 +28,9 @@ return [
                  * The list of directories and files that will be included in the backup.
                  */
                 'include' => [
-                    base_path(),
+                    // base_path(),
                     // storage_path(),  // Include if you use zero downtime deployments and don't follow symlinks
+                    storage_path('app/images')
                 ],
 
                 /*
@@ -161,11 +164,9 @@ return [
             'filename_prefix' => '',
 
             /*
-             * The disk names on which the backups will be stored.
+             * Los nombres de los discos en los que se almacenarán las copias de seguridad.
              */
-            'disks' => [
-                'local',
-            ],
+            'disks' => explode(',', env('BACKUP_DISKS', 'backups')),
 
             /*
              * Determines whether to allow backups to continue when some targets fail instead of failing completely.
@@ -221,12 +222,12 @@ return [
      */
     'notifications' => [
         'notifications' => [
-            BackupHasFailedNotification::class => ['mail'],
-            UnhealthyBackupWasFoundNotification::class => ['mail'],
-            CleanupHasFailedNotification::class => ['mail'],
-            BackupWasSuccessfulNotification::class => ['mail'],
-            HealthyBackupWasFoundNotification::class => ['mail'],
-            CleanupWasSuccessfulNotification::class => ['mail'],
+            BackupHasFailedNotification::class => $notificationsRoutes,
+            UnhealthyBackupWasFoundNotification::class => $notificationsRoutes,
+            CleanupHasFailedNotification::class => $notificationsRoutes,
+            BackupWasSuccessfulNotification::class => $notificationsRoutes,
+            HealthyBackupWasFoundNotification::class => $notificationsRoutes,
+            CleanupWasSuccessfulNotification::class => $notificationsRoutes,
         ],
 
         /*
@@ -258,7 +259,7 @@ return [
         ],
 
         'discord' => [
-            'webhook_url' => '',
+            'webhook_url' => env('DISCORD_WEBHOOK_URL'),
 
             /*
              * If this is an empty string, the name field on the webhook will be used.
@@ -297,7 +298,7 @@ return [
     'monitor_backups' => [
         [
             'name' => env('APP_NAME', 'laravel-backup'),
-            'disks' => ['local'],
+            'disks' => explode(',', env('BACKUP_DISKS', 'backups')),
             'health_checks' => [
                 MaximumAgeInDays::class => 1,
                 MaximumStorageInMegabytes::class => 5000,

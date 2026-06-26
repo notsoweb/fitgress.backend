@@ -37,6 +37,14 @@ class ChangelogController extends Controller
                     'ADD: Comando para enviar un correo de prueba.',
                 ]
             ],
+            [
+                'version' => '0.9.11',
+                'date' => '2026-06-25',
+                'changes' => [
+                    'ADD: Notificaciones de backup automático y manual por discord.',
+                    'ADD: Configuración de R2 de Cloudflare como disco de backup.',
+                ],
+            ],
         ]));
     }
 }
