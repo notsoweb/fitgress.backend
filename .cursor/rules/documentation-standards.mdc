@@ -1,0 +1,29 @@
+---
+description: Documentar arquitectura, modelos y cambios en docs/
+alwaysApply: true
+---
+
+# Documentación obligatoria
+
+Todo cambio funcional o estructural debe documentarse en `docs/`.
+
+## Qué documentar
+
+| Cambio | Dónde |
+|--------|-------|
+| Nuevo módulo o rutas API | `docs/modules/<modulo>.md` + `docs/integration.md` |
+| Modelos o relaciones | `docs/database.md` |
+| Variables de entorno | `docs/configuration.md` |
+| Arquitectura o patrones | `docs/architecture.md` |
+| Índice general | `docs/README.md` |
+
+## Estilo de comentarios en PHP
+
+- `@copyright` al inicio del archivo
+- PHPDoc en clases: descripción, `@author`, `@version`
+- Comentarios breves en métodos públicos; PHPDoc para lógica no obvia
+- Sin comentarios que repitan lo que el código ya dice
+
+## Regla
+
+No cerrar una tarea sin actualizar la documentación afectada.

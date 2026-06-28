@@ -45,6 +45,15 @@ class ChangelogController extends Controller
                     'ADD: Configuración de R2 de Cloudflare como disco de backup.',
                 ],
             ],
+            [
+                'version' => '0.9.12',
+                'date' => '2026-06-27',
+                'changes' => [
+                    'ADD: Creación de rules y skills para agentes de IA.',
+                    'ADD: Integración con codebase memory MCP (para desarrollo).',
+                    'UPDATE: Actualización de documentación.',
+                ],
+            ],
         ]));
     }
 }

@@ -1,0 +1,28 @@
+---
+description: Crear tests PHPUnit para toda funcionalidad nueva del backend
+alwaysApply: true
+---
+
+# Tests obligatorios (backend)
+
+Toda funcionalidad nueva requiere tests PHPUnit.
+
+## Tipos
+
+| Tipo | Cuándo |
+|------|--------|
+| Feature | Endpoints HTTP, auth, permisos, flujos completos |
+| Unit | Lógica aislada en Actions, Supports, métodos de modelo |
+
+## Convenciones
+
+- Crear con `php artisan make:test --phpunit {Name}` o `--unit` para unitarios
+- Usar factories (`User::factory()`) y estados existentes
+- Preferir `LazilyRefreshDatabase` sobre `RefreshDatabase`
+- Cubrir: happy path, validación fallida, permisos denegados
+- Ejecutar el test afectado antes de finalizar: `php artisan test --compact --filter=testName`
+- Formatear PHP con `vendor/bin/pint --dirty --format agent`
+
+## Referencia
+
+Activar skill `argos-backend-development` y `laravel-best-practices` (rules/testing.md).

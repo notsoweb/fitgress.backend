@@ -1,0 +1,27 @@
+---
+description: Buscar código con Codebase Memory MCP antes que grep o lectura masiva
+alwaysApply: true
+---
+
+# Codebase Memory MCP — primera instancia
+
+Antes de grep, glob o leer muchos archivos, usar el MCP **user-codebase-memory-mcp**.
+
+## Proyecto
+
+`var-www-mdev-argos.backend`
+
+## Flujo
+
+1. `get_architecture` — panorama del módulo
+2. `search_graph` — localizar clases, métodos, rutas
+3. `search_code` — patrones de texto con ranking estructural
+4. `get_code_snippet` — leer implementación de un símbolo
+
+## Cuándo complementar
+
+- `.env`, migraciones recién creadas, código no indexado
+- Documentación en `docs/` — leer el markdown correspondiente
+- Paquetes Laravel — Laravel Boost `search-docs`
+
+Detalle completo: `docs/codebase-memory.md`
