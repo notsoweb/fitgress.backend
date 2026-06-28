@@ -1,10 +1,18 @@
-<?php
-
-namespace App\Providers;
+<?php namespace App\Providers;
+/**
+ * @copyright (c) 2026 MCortesDev (https://mcortes.dev) - All Rights Reserved
+ */
 
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
 
+/**
+ * Servicio de la aplicación
+ * 
+ * @author Moisés Cortés C. <soy@mcortes.dev>
+ * 
+ * @version 1.0.0
+ */
 class AppServiceProvider extends ServiceProvider
 {
     /**

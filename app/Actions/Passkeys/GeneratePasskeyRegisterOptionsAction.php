@@ -1,7 +1,4 @@
-<?php
-
-namespace App\Actions\Passkeys;
-
+<?php namespace App\Actions\Passkeys;
 /**
  * @copyright (c) 2026 MCortesDev (https://mcortes.dev) - All Rights Reserved
  */

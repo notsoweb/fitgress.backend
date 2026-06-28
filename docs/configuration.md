@@ -8,7 +8,7 @@ Copiar desde `.env.example`:
 
 | Variable | Ejemplo | Descripción |
 |----------|---------|-------------|
-| `APP_NAME` | Licia | Nombre de la app |
+| `APP_NAME` | Argos | Nombre de la app |
 | `APP_URL` | `http://argos.mdev.test/core` | URL del API |
 | `APP_FRONTEND_URL` | `http://argos.mdev.test` | SPA — CORS y passkeys |
 | `APP_LOCALE` | `es` | Idioma |

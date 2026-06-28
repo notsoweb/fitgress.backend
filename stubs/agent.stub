@@ -1,6 +1,7 @@
-<?php
-
-namespace {{ namespace }};
+<?php namespace {{ namespace }};
+/**
+ * @copyright (c) 2026 MCortesDev (https://mcortes.dev) - All Rights Reserved
+ */
 
 use Laravel\Ai\Contracts\Agent;
 use Laravel\Ai\Contracts\Conversational;
@@ -10,6 +11,13 @@ use Laravel\Ai\Messages\Message;
 use Laravel\Ai\Promptable;
 use Stringable;
 
+/**
+ * Descripción
+ *
+ * @author Moisés Cortés C. <soy@mcortes.dev>
+ *
+ * @version 1.0.0
+ */
 class {{ class }} implements Agent, Conversational, HasTools
 {
     use Promptable;

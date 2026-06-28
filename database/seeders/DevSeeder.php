@@ -3,7 +3,6 @@
  * @copyright (c) 2026 Mdev (https://mcortes.dev) - All rights reserved.
  */
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 

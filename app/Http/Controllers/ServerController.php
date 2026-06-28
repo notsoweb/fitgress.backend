@@ -3,7 +3,6 @@
  * @copyright (c) 2026 Mdev (https://mcortes.dev) - All rights reserved.
  */
 
-use Illuminate\Http\Request;
 use Notsoweb\ApiResponse\Enums\ApiResponse;
 
 /**

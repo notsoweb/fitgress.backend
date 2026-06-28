@@ -1,6 +1,6 @@
-# Licia Backend — Documentación
+# Argos Backend — Documentación
 
-API REST construida con **Laravel 13** sobre el boilerplate **Argos** (`notsoweb/laravel-core`). Expone autenticación OAuth2, administración de usuarios/roles, notificaciones en tiempo real y el dominio **LICIA**: análisis de licitaciones públicas mexicanas mediante IA.
+API REST construida con **Laravel 13** sobre el boilerplate **Argos** (`notsoweb/laravel-core`). Expone autenticación OAuth2, administración de usuarios/roles, notificaciones en tiempo real y puntos de extensión para dominio propio en `routes/api.php`.
 
 ## Índice
 
@@ -9,6 +9,8 @@ API REST construida con **Laravel 13** sobre el boilerplate **Argos** (`notsoweb
 | [Arquitectura](./architecture.md) | Stack, estructura de carpetas y flujo general |
 | [Configuración](./configuration.md) | Variables de entorno y archivos de config |
 | [Base de datos](./database.md) | Modelos, relaciones y migraciones |
+| [Integración](./integration.md) | Contrato con el frontend Vue |
+| [Codebase Memory MCP](./codebase-memory.md) | Búsqueda de código con el grafo indexado |
 
 ### Módulos
 
@@ -26,7 +28,7 @@ API REST construida con **Laravel 13** sobre el boilerplate **Argos** (`notsoweb
 
 | Campo | Valor |
 |-------|-------|
-| Versión | `0.9.10` (ver `config/app.php`) |
+| Versión | `0.9.11` (ver `config/app.php`) |
 | PHP | 8.5 |
 | Base de datos por defecto | PostgreSQL |
 | Idioma / zona horaria | `es` / `America/Mexico_City` |
@@ -45,7 +47,7 @@ composer run db:dev   # seeders + cliente Passport personal
 php artisan serve
 ```
 
-Variables críticas para LICIA: `GEMINI_API_KEY`, `APP_FRONTEND_URL`, `CORS_ALLOWED_ORIGINS`.
+Variables críticas: `APP_FRONTEND_URL`, `CORS_ALLOWED_ORIGINS`. Para IA opcional: `GEMINI_API_KEY` (ver [modules/ai-agents.md](./modules/ai-agents.md)).
 
 ## Mapa de dependencias entre módulos
 
@@ -59,7 +61,9 @@ notsoweb/laravel-core (ApiResponse, traits)
         │                       └── Broadcast Events
         │
         ├── System (referencias, notificaciones)
-        ├── Resources (Ziggy, metadatos app)
-        └── LICIA (ProcessDocument → laravel/ai → Gemini)
-        └── Projects (portafolio, ProjectStatusEk)
+        └── Resources (Ziggy, metadatos app)
 ```
+
+## Extender el dominio
+
+Las rutas de negocio propio van en `routes/api.php` dentro de `auth:api`. Documentar cada módulo nuevo en `docs/modules/` y actualizar [integration.md](./integration.md).

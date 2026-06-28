@@ -20,7 +20,7 @@ Este documento describe cómo el backend Laravel se conecta con la SPA Vue 3 en 
                                ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                   argos.backend (Laravel 13)                   │
-│  /api/*  →  Passport auth  →  Controllers  →  Models / AI     │
+│  /api/*  →  Passport auth  →  Controllers  →  Models          │
 │                                                                  │
 │  Ziggy: GET /api/resources/routes  →  mapa de rutas nombradas   │
 │  Reverb: WebSocket (opcional) para notificaciones y presencia   │
@@ -99,6 +99,6 @@ Los roles sembrados (`developer`, `admin`) determinan qué módulos del frontend
 
 Para agregar una nueva funcionalidad de dominio:
 
-1. **Backend**: ruta en `routes/api.php` bajo `auth:api`, controlador, y opcionalmente agente AI.
+1. **Backend**: ruta en `routes/api.php` bajo `auth:api`, controlador, Form Request, y tests PHPUnit.
 2. **Frontend**: página en `src/pages/`, entrada en el router, `Module.js` con `apiTo()` / `viewTo()`.
 3. Ziggy expone automáticamente la nueva ruta nombrada al reiniciar el backend.

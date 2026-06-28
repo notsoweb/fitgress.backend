@@ -24,6 +24,24 @@ This application is a Laravel application and its main Laravel ecosystems packag
 
 This project has domain-specific skills available in `**/skills/**`. You MUST activate the relevant skill whenever you work in that domain—don't wait until you're stuck.
 
+- `codebase-memory` — explorar código con el grafo MCP antes de grep
+- `argos-backend-development` — convenciones Argos, documentación y tests
+- `laravel-best-practices`, `passport-development`, `laravel-permission-development` — según dominio
+
+## Codebase Memory MCP
+
+Proyecto indexado: `var-www-mdev-argos.backend`
+
+Usar el MCP **user-codebase-memory-mcp** en primera instancia. Flujo: `get_architecture` → `search_graph` → `get_code_snippet`. Detalle en `docs/codebase-memory.md`.
+
+## Project Documentation
+
+La documentación del proyecto vive en `docs/`. **Siempre** actualizar `docs/` al cambiar arquitectura, modelos, rutas o módulos. Ver `.cursor/rules/documentation-standards.mdc`.
+
+## Tests
+
+Toda funcionalidad nueva requiere tests PHPUnit (Feature y/o Unit). Ver `.cursor/rules/backend-testing.mdc`.
+
 ## Conventions
 
 - You must follow all existing code conventions used in this application. When creating or editing a file, check sibling files for the correct structure, approach, and naming.
@@ -45,7 +63,8 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 ## Documentation Files
 
-- You must only create documentation files if explicitly requested by the user.
+- La documentación del proyecto en `docs/` debe mantenerse actualizada con cada cambio funcional.
+- No crear archivos markdown adicionales fuera de `docs/` salvo petición explícita del usuario.
 
 ## Replies
 

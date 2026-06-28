@@ -1,7 +1,4 @@
-<?php
-
-namespace App\Mail;
-
+<?php namespace App\Mail;
 /**
  * @copyright (c) 2026 MCortesDev (https://mcortes.dev) - All Rights Reserved
  */

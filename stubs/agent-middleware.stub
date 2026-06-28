@@ -1,11 +1,20 @@
-<?php
-
-namespace {{ namespace }};
+<?php namespace {{ namespace }};
+/**
+ * @copyright (c) 2026 MCortesDev (https://mcortes.dev) - All Rights Reserved
+ */
 
 use Closure;
 use Laravel\Ai\Prompts\AgentPrompt;
 use Laravel\Ai\Responses\AgentResponse;
 
+
+/**
+ * Descripción
+ *
+ * @author Moisés Cortés C. <soy@mcortes.dev>
+ *
+ * @version 1.0.0
+ */
 class {{ class }}
 {
     /**
