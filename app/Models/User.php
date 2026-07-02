@@ -1,4 +1,7 @@
-<?php namespace App\Models;
+<?php
+
+namespace App\Models;
+
 /**
  * @copyright (c) 2026 Mdev (https://mcortes.dev) - All rights reserved.
  */
@@ -127,6 +130,14 @@ class User extends Authenticatable implements HasPasskeys
     public function passwordResetTokens()
     {
         return $this->hasMany(PasswordResetToken::class);
+    }
+
+    /**
+     * Registros de entrenamiento del usuario
+     */
+    public function registros()
+    {
+        return $this->hasMany(Registro::class);
     }
 
     // Acciones

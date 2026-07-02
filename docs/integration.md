@@ -60,6 +60,9 @@ Todas las llamadas posteriores usan `route('nombre.ruta', params)` de `ziggy-js`
 | System Notifications | `system.notifications.*` | `stores/Notifier.js` + `Profile/Notifications/` | `profile.notifications.index` |
 | System Roles | `system.roles.*` | Selectores en formularios admin | — |
 | Changelogs | `changelogs` | `pages/Changelogs/` | `changelogs.app`, `changelogs.core` |
+| **Gym Machines** | `gym.machines.*` | `pages/Gym/Machines/` | `gym.machines.index`, `gym.machines.create`, `gym.machines.edit` |
+| **Gym Plans** | `gym.plans.*`, `gym.plans.machines(.sync)` | `pages/Gym/Plans/` | `gym.plans.index`, `gym.plans.create`, `gym.plans.edit` |
+| **Gym Registros** | `gym.registros.*`, `gym.registros.charts` | `pages/Gym/{Registros,Registro,Charts}/` | `gym.registros.index`, `gym.registro`, `gym.charts` |
 
 ## Tiempo real (Reverb)
 

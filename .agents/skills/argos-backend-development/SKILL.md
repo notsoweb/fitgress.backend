@@ -79,3 +79,6 @@ Actualizar siempre:
 - `passport-development` — OAuth2 y tokens
 - `laravel-permission-development` — roles y permisos
 - `codebase-memory` — exploración de código
+
+# Base de datos
+- Todos los nombres de tablas y modelos, van en ingles, siguiendo las convenciones de LARAVEL.

@@ -39,6 +39,38 @@ LogEvent
 └── morphTo reportable (User, Role, …)
 ```
 
+## Módulo Gimnasio
+
+```
+User
+└── hasMany Registro (historial de entrenamiento)
+
+Machine
+├── belongsToMany Plan (gym_plan_machines, pivot position)
+Machine
+├── hasMany MachineProperty (name, value, unit, position)
+├── belongsToMany Plan (gym_plan_machines, pivot position)
+└── hasMany Registro
+
+Plan
+├── belongsToMany Machine (gym_plan_machines, pivot position)
+└── hasMany Registro
+
+Registro
+├── belongsTo User
+├── belongsTo Machine
+└── belongsTo Plan (nullable)
+
+MachineProperty
+└── belongsTo Machine
+```
+
+- `gym_machines`: id, name, description, code (unique), type_ek (enum T/W).
+- `gym_machine_properties`: id, machine_id, name, value (nullable), unit (nullable), position. Índice en `(machine_id, position)`.
+- `gym_plans`: id, name, description.
+- `gym_plan_machines`: plan_id, machine_id, position, unique(plan_id, machine_id).
+- `gym_registros`: id, user_id, machine_id, plan_id (nullable), series, reps, weight (nullable), performed_at. Índices en `(user_id, performed_at)` y `machine_id`.
+
 ## Tablas del sistema
 
 | Tabla | Migración | Uso |
@@ -53,6 +85,7 @@ LogEvent
 | `notifications` | `2026_05_17_024231` | Notificaciones in-app |
 | `settings` | `2026_05_17_024320` | Configuración app |
 | `passkeys` | `2026_06_12_155113` | WebAuthn |
+| `gym_machines`, `gym_plans`, `gym_plan_machines`, `gym_registros`, `gym_machine_properties` | `2026_07_02_000001`–`000005` | Módulo Gimnasio |
 
 ## Seeders
 
