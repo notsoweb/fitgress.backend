@@ -1,4 +1,7 @@
-<?php namespace Database\Seeders;
+<?php
+
+namespace Database\Seeders;
+
 /**
  * @copyright (c) 2026 Mdev (https://mcortes.dev) - All rights reserved.
  */
@@ -66,6 +69,25 @@ class RoleSeeder extends Seeder
             guardName: 'api'
         );
 
+        // Permisos del gimnasio
+        $gym = PermissionType::firstOrCreate([
+            'name' => 'Gimnasio',
+        ]);
+
+        [
+            $machineIndex,
+            $machineCreate,
+            $machineEdit,
+            $machineDestroy
+        ] = $this->onCRUD('machines', $gym, 'api');
+
+        [
+            $planIndex,
+            $planCreate,
+            $planEdit,
+            $planDestroy
+        ] = $this->onCRUD('plans', $gym, 'api');
+
         // Rol desarrollador
         Role::firstOrCreate([
             'name' => 'developer',
@@ -97,6 +119,14 @@ class RoleSeeder extends Seeder
             $roleEdit,
             $roleDestroy,
             $activityIndex,
+            $machineIndex,
+            $machineCreate,
+            $machineEdit,
+            $machineDestroy,
+            $planIndex,
+            $planCreate,
+            $planEdit,
+            $planDestroy,
         );
     }
 }
