@@ -7,7 +7,7 @@ description: Explora el código del backend Argos usando el grafo indexado de Co
 
 ## Proyecto MCP
 
-`var-www-mdev-argos.backend`
+`var-www-mdev-fitgress.backend`
 
 ## Flujo
 
@@ -23,14 +23,14 @@ description: Explora el código del backend Argos usando el grafo indexado de Co
 ### Encontrar un controlador
 
 ```json
-{ "project": "var-www-mdev-argos.backend", "query": "passkey login", "label": "Method" }
+{ "project": "var-www-mdev-fitgress.backend", "query": "passkey login", "label": "Method" }
 ```
 
 ### Buscar patrón en HTTP
 
 ```json
 {
-  "project": "var-www-mdev-argos.backend",
+  "project": "var-www-mdev-fitgress.backend",
   "pattern": "HasMiddleware",
   "path_filter": "^app/Http/",
   "mode": "compact",
