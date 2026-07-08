@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Machine;
+use App\Models\Exercise;
 use App\Models\Plan;
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
@@ -72,25 +72,25 @@ class PlanTest extends TestCase
         $this->assertDatabaseMissing('gym_plans', ['id' => $plan->id]);
     }
 
-    public function test_machines_endpoint_returns_ordered_machines(): void
+    public function test_exercises_endpoint_returns_ordered_exercises(): void
     {
         $plan = Plan::factory()->create();
-        $m1 = Machine::factory()->create();
-        $m2 = Machine::factory()->create();
+        $e1 = Exercise::factory()->reps()->create();
+        $e2 = Exercise::factory()->reps()->create();
 
-        $plan->machines()->sync([$m1->id => ['position' => 1], $m2->id => ['position' => 0]]);
+        $plan->exercises()->sync([$e1->id => ['position' => 1], $e2->id => ['position' => 0]]);
 
-        $response = $this->actingAs($this->admin, 'api')->getJson("/api/gym/plans/{$plan->id}/machines");
+        $response = $this->actingAs($this->admin, 'api')->getJson("/api/gym/plans/{$plan->id}/exercises");
 
-        $response->assertOk()->assertJsonPath('data.machines.0.id', $m2->id);
+        $response->assertOk()->assertJsonPath('data.exercises.0.id', $e2->id);
     }
 
-    public function test_sync_requires_machines_array(): void
+    public function test_sync_requires_exercises_array(): void
     {
         $plan = Plan::factory()->create();
 
         $this->actingAs($this->admin, 'api')
-            ->putJson("/api/gym/plans/{$plan->id}/machines", ['machines' => []])
+            ->putJson("/api/gym/plans/{$plan->id}/exercises", ['exercises' => []])
             ->assertStatus(422);
     }
 
@@ -101,20 +101,33 @@ class PlanTest extends TestCase
             ->assertStatus(422);
     }
 
-    public function test_admin_can_attach_machines_to_plan(): void
+    public function test_admin_can_attach_exercises_to_plan(): void
     {
         $plan = Plan::factory()->create();
-        $m1 = Machine::factory()->create();
-        $m2 = Machine::factory()->create();
+        $e1 = Exercise::factory()->reps()->create();
+        $e2 = Exercise::factory()->weight()->create();
 
-        $response = $this->actingAs($this->admin, 'api')->putJson("/api/gym/plans/{$plan->id}/machines", [
-            'machines' => [
-                ['id' => $m1->id, 'position' => 0],
-                ['id' => $m2->id, 'position' => 1],
+        $response = $this->actingAs($this->admin, 'api')->putJson("/api/gym/plans/{$plan->id}/exercises", [
+            'exercises' => [
+                ['id' => $e1->id, 'position' => 0],
+                ['id' => $e2->id, 'position' => 1],
             ],
         ]);
 
-        $response->assertOk()->assertJsonPath('data.machines.0.id', $m1->id);
-        $this->assertSame([$m1->id, $m2->id], $plan->machines()->pluck('gym_machines.id')->toArray());
+        $response->assertOk()->assertJsonPath('data.exercises.0.id', $e1->id);
+        $this->assertSame([$e1->id, $e2->id], $plan->exercises()->pluck('gym_exercises.id')->toArray());
+    }
+
+    public function test_show_includes_exercises_with_machine(): void
+    {
+        $plan = Plan::factory()->create();
+        $exercise = Exercise::factory()->weight()->create();
+        $plan->exercises()->sync([$exercise->id => ['position' => 0]]);
+
+        $this->actingAs($this->admin, 'api')
+            ->getJson("/api/gym/plans/{$plan->id}")
+            ->assertOk()
+            ->assertJsonPath('data.model.exercises.0.id', $exercise->id)
+            ->assertJsonPath('data.model.exercises.0.effective_type', 'W');
     }
 }

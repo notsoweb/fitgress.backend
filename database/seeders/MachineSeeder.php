@@ -7,16 +7,16 @@ namespace Database\Seeders;
  */
 
 use App\Emums\MachineTypeEk;
+use App\Models\Exercise;
 use App\Models\Machine;
-use App\Models\MachineProperty;
 use Illuminate\Database\Seeder;
 
 /**
- * Máquinas de ejemplo del gimnasio
+ * Máquinas y ejercicios de ejemplo del gimnasio
  *
  * @author Moisés Cortés C. <soy@mcortes.dev>
  *
- * @version 1.0.0
+ * @version 2.0.0
  */
 class MachineSeeder extends Seeder
 {
@@ -30,65 +30,61 @@ class MachineSeeder extends Seeder
                 'name' => 'Press banca',
                 'code' => 'MCH-PRESS-BANCA',
                 'type_ek' => MachineTypeEk::WEIGHT,
-                'properties' => [
-                    ['name' => 'Altura del asiento', 'value' => '3', 'unit' => 'nivel'],
-                    ['name' => 'Inclinación', 'value' => '0', 'unit' => '°'],
+                'exercises' => [
+                    [
+                        'name' => 'Press de banca plano',
+                        'properties' => [
+                            ['name' => 'Altura del asiento', 'value' => '3', 'unit' => 'nivel'],
+                            ['name' => 'Inclinación', 'value' => '0', 'unit' => '°'],
+                        ],
+                    ],
+                    ['name' => 'Press de banca inclinado', 'properties' => []],
                 ],
             ],
             [
-                'name' => 'Sentadilla',
+                'name' => 'Sentadilla (rack)',
                 'code' => 'MCH-SENTADILLA',
                 'type_ek' => MachineTypeEk::WEIGHT,
-                'properties' => [
-                    ['name' => 'Altura de la barra', 'value' => '150', 'unit' => 'cm'],
-                    ['name' => 'Distancia al pecho', 'value' => '40', 'unit' => 'cm'],
-                ],
-            ],
-            [
-                'name' => 'Peso muerto',
-                'code' => 'MCH-PESO-MUERTO',
-                'type_ek' => MachineTypeEk::WEIGHT,
-                'properties' => [],
-            ],
-            [
-                'name' => 'Press militar',
-                'code' => 'MCH-PRESS-MILITAR',
-                'type_ek' => MachineTypeEk::WEIGHT,
-                'properties' => [
-                    ['name' => 'Altura del asiento', 'value' => '5', 'unit' => 'nivel'],
-                    ['name' => 'Distancia al pecho', 'value' => '30', 'unit' => 'cm'],
+                'exercises' => [
+                    [
+                        'name' => 'Sentadilla trasera',
+                        'properties' => [
+                            ['name' => 'Altura de la barra', 'value' => '150', 'unit' => 'cm'],
+                        ],
+                    ],
                 ],
             ],
             [
                 'name' => 'Caminadora',
                 'code' => 'MCH-CAMINADORA',
-                'type_ek' => MachineTypeEk::TIME,
-                'properties' => [
-                    ['name' => 'Inclinación', 'value' => '5', 'unit' => '%'],
+                'type_ek' => MachineTypeEk::DISTANCE,
+                'exercises' => [
+                    [
+                        'name' => 'Caminata',
+                        'properties' => [
+                            ['name' => 'Inclinación', 'value' => '5', 'unit' => '%'],
+                        ],
+                    ],
+                    ['name' => 'Trote', 'properties' => []],
                 ],
             ],
             [
                 'name' => 'Bicicleta estática',
                 'code' => 'MCH-BICI',
-                'type_ek' => MachineTypeEk::TIME,
-                'properties' => [
-                    ['name' => 'Altura del asiento', 'value' => '8', 'unit' => 'nivel'],
-                    ['name' => 'Distancia al manubrio', 'value' => '45', 'unit' => 'cm'],
-                ],
-            ],
-            [
-                'name' => 'Elíptica',
-                'code' => 'MCH-ELIPTICA',
-                'type_ek' => MachineTypeEk::TIME,
-                'properties' => [
-                    ['name' => 'Nivel de resistencia', 'value' => '6', 'unit' => 'nivel'],
+                'type_ek' => MachineTypeEk::DISTANCE,
+                'exercises' => [
+                    [
+                        'name' => 'Ciclismo estático',
+                        'properties' => [
+                            ['name' => 'Altura del asiento', 'value' => '8', 'unit' => 'nivel'],
+                        ],
+                    ],
                 ],
             ],
         ];
 
         foreach ($machines as $data) {
-            $properties = $data['properties'];
-            unset($data['properties']);
+            $exercises = $data['exercises'];
 
             $machine = Machine::firstOrCreate(
                 ['code' => $data['code']],
@@ -99,10 +95,20 @@ class MachineSeeder extends Seeder
                 ],
             );
 
-            if ($machine->wasRecentlyCreated && ! empty($properties)) {
-                foreach ($properties as $index => $prop) {
-                    MachineProperty::create([
-                        'machine_id' => $machine->id,
+            if (! $machine->wasRecentlyCreated) {
+                continue;
+            }
+
+            foreach ($exercises as $exerciseData) {
+                $exercise = Exercise::create([
+                    'machine_id' => $machine->id,
+                    'name' => $exerciseData['name'],
+                    'description' => null,
+                    'type_ek' => null,
+                ]);
+
+                foreach ($exerciseData['properties'] as $index => $prop) {
+                    $exercise->properties()->create([
                         'name' => $prop['name'],
                         'value' => $prop['value'],
                         'unit' => $prop['unit'],
@@ -110,6 +116,24 @@ class MachineSeeder extends Seeder
                     ]);
                 }
             }
+        }
+
+        // Ejercicios sin máquina (peso corporal / repeticiones)
+        $bodyweight = [
+            'Lagartijas',
+            'Abdominales',
+            'Sentadilla sin peso',
+        ];
+
+        foreach ($bodyweight as $name) {
+            Exercise::firstOrCreate(
+                ['name' => $name],
+                [
+                    'machine_id' => null,
+                    'description' => null,
+                    'type_ek' => MachineTypeEk::REPS->value,
+                ],
+            );
         }
     }
 }

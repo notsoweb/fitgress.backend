@@ -1,4 +1,7 @@
-<?php namespace App\Models;
+<?php
+
+namespace App\Models;
+
 /**
  * @copyright (c) 2026 Mdev (https://mcortes.dev) - All rights reserved.
  */
@@ -7,19 +10,19 @@ use App\Emums\SettingTypeEk;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
- /**
-  * Configuraciones del sistema
-  * 
-  * @author Moisés Cortés C. <soy@mcortes.dev>
-  * 
-  * @version 1.0.0
-  */
- #[Fillable([
+/**
+ * Configuraciones del sistema
+ *
+ * @author Moisés Cortés C. <soy@mcortes.dev>
+ *
+ * @version 1.0.0
+ */
+#[Fillable([
     'code',
     'description',
     'value',
-    'type_ek'
- ])]
+    'type_ek',
+])]
 class Setting extends Model
 {
     /**
@@ -28,7 +31,7 @@ class Setting extends Model
     protected function casts(): array
     {
         return [
-            'value' => 'json'
+            'value' => 'json',
         ];
     }
 

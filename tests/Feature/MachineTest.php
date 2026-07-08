@@ -50,57 +50,26 @@ class MachineTest extends TestCase
             'description' => 'Banco plano',
             'code' => 'MCH-PRESS-BANCA',
             'type_ek' => 'W',
-            'properties' => [
-                ['name' => 'Altura del asiento', 'value' => '3', 'unit' => 'nivel'],
-                ['name' => 'Inclinación', 'value' => '0', 'unit' => '°'],
-            ],
         ]);
 
         $response->assertStatus(201);
         $this->assertDatabaseHas('gym_machines', ['code' => 'MCH-PRESS-BANCA']);
-        $this->assertDatabaseHas('gym_machine_properties', [
-            'name' => 'Altura del asiento',
-            'value' => '3',
-            'unit' => 'nivel',
-        ]);
     }
 
     public function test_admin_can_update_machine(): void
     {
-        $machine = Machine::factory()->create();
-        $machine->properties()->create([
-            'name' => 'Altura del asiento',
-            'value' => '3',
-            'unit' => 'nivel',
-            'position' => 0,
-        ]);
+        $machine = Machine::factory()->weight()->create();
 
         $response = $this->actingAs($this->admin, 'api')->putJson("/api/gym/machines/{$machine->id}", [
             'name' => 'Actualizada',
             'description' => null,
             'code' => $machine->code,
-            'type_ek' => 'T',
-            'properties' => [
-                ['name' => 'Distancia al pecho', 'value' => '40', 'unit' => 'cm'],
-            ],
+            'type_ek' => 'D',
         ]);
 
         $response->assertOk();
         $this->assertSame('Actualizada', $machine->fresh()->name);
-        $this->assertSame('T', $machine->fresh()->type_ek->value);
-        $this->assertDatabaseMissing('gym_machine_properties', ['name' => 'Altura del asiento']);
-        $this->assertDatabaseHas('gym_machine_properties', ['name' => 'Distancia al pecho']);
-    }
-
-    public function test_show_includes_properties(): void
-    {
-        $machine = Machine::factory()->withProperties()->create();
-
-        $response = $this->actingAs($this->admin, 'api')->getJson("/api/gym/machines/{$machine->id}");
-
-        $response->assertOk()->assertJsonStructure([
-            'data' => ['model' => ['id', 'name', 'properties' => [['id', 'name', 'value', 'unit']]]],
-        ]);
+        $this->assertSame('D', $machine->fresh()->type_ek->value);
     }
 
     public function test_admin_can_destroy_machine(): void

@@ -9,26 +9,35 @@ namespace App\Emums;
 use Notsoweb\LaravelCore\Traits\Enums\Extended;
 
 /**
- * Tipos de máquina del gimnasio
+ * Tipos de ejercicio/máquina del gimnasio
  *
- * - `TIME`: el avance se mide por tiempo (ej. caminta, bicicleta).
- * - `WEIGHT`: el avance se mide por peso levantado.
+ * Define cómo se mide el avance de un ejercicio. El tipo puede vivir en la
+ * máquina (tipo nativo) y ser sobrescrito por el ejercicio.
+ *
+ * - `REPS`: avance por series y repeticiones (ej. lagartijas, abdominales).
+ * - `WEIGHT`: avance por peso levantado, además de series y repeticiones.
+ * - `DISTANCE`: avance por duración y distancia (ej. caminadora, bicicleta).
  *
  * @author Moisés Cortés C. <soy@mcortes.dev>
  *
- * @version 1.0.0
+ * @version 2.0.0
  */
 enum MachineTypeEk: string
 {
     use Extended;
 
     /**
-     * Máquina de tiempo
+     * Ejercicio de repeticiones (series + reps)
      */
-    case TIME = 'T';
+    case REPS = 'R';
 
     /**
-     * Máquina de peso
+     * Ejercicio de fuerza (series + reps + peso)
      */
     case WEIGHT = 'W';
+
+    /**
+     * Ejercicio de distancia (duración + distancia + velocidad/inclinación)
+     */
+    case DISTANCE = 'D';
 }

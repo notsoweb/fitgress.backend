@@ -15,13 +15,14 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Notsoweb\ApiResponse\Enums\ApiResponse;
 
 /**
- * Máquinas del gimnasio
+ * Máquinas del gimnasio (equipo)
  *
- * Requiere permisos `machines.*` (admin/developer).
+ * Requiere permisos `machines.*` (admin/developer). Las propiedades y notas
+ * viven en el ejercicio, no en la máquina.
  *
  * @author Moisés Cortés C. <soy@mcortes.dev>
  *
- * @version 1.0.0
+ * @version 2.0.0
  */
 class MachineController extends Controller implements HasMiddleware
 {
@@ -43,7 +44,7 @@ class MachineController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        $models = Machine::with('properties')->orderBy('name');
+        $models = Machine::orderBy('name');
 
         QuerySupport::queryByKeys($models, ['name', 'code', 'description']);
 
@@ -57,11 +58,7 @@ class MachineController extends Controller implements HasMiddleware
      */
     public function store(MachineStoreRequest $request)
     {
-        $data = $request->safe()->except('properties');
-
-        $machine = Machine::create($data);
-
-        $this->syncProperties($machine, $request->input('properties', []));
+        Machine::create($request->validated());
 
         return ApiResponse::CREATED->response();
     }
@@ -72,7 +69,7 @@ class MachineController extends Controller implements HasMiddleware
     public function show(Machine $machine)
     {
         return ApiResponse::OK->response([
-            'model' => $machine->load('properties'),
+            'model' => $machine,
         ]);
     }
 
@@ -81,11 +78,7 @@ class MachineController extends Controller implements HasMiddleware
      */
     public function update(MachineUpdateRequest $request, Machine $machine)
     {
-        $data = $request->safe()->except('properties');
-
-        $machine->update($data);
-
-        $this->syncProperties($machine, $request->input('properties', []));
+        $machine->update($request->validated());
 
         return ApiResponse::OK->response();
     }
@@ -100,33 +93,5 @@ class MachineController extends Controller implements HasMiddleware
         return ApiResponse::OK->response([
             'deleted' => true,
         ]);
-    }
-
-    /**
-     * Sincronizar propiedades de la máquina
-     *
-     * Reemplaza las propiedades existentes por las enviadas en la solicitud.
-     *
-     * @param  array<int, array{name: string, value: ?string, unit: ?string}>  $properties
-     */
-    private function syncProperties(Machine $machine, array $properties): void
-    {
-        $machine->properties()->delete();
-
-        if (empty($properties)) {
-            return;
-        }
-
-        $records = array_map(fn (array $item, int $index) => [
-            'machine_id' => $machine->id,
-            'name' => $item['name'],
-            'value' => $item['value'] ?? null,
-            'unit' => $item['unit'] ?? null,
-            'position' => $index,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ], $properties, array_keys($properties));
-
-        $machine->properties()->createMany($records);
     }
 }

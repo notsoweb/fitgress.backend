@@ -27,7 +27,17 @@ class MachineFactory extends Factory
     }
 
     /**
-     * Máquina de tipo peso
+     * Máquina de tipo repeticiones
+     */
+    public function reps(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'type_ek' => MachineTypeEk::REPS->value,
+        ]);
+    }
+
+    /**
+     * Máquina de tipo fuerza (peso)
      */
     public function weight(): static
     {
@@ -37,25 +47,12 @@ class MachineFactory extends Factory
     }
 
     /**
-     * Máquina de tipo tiempo
+     * Máquina de tipo distancia
      */
-    public function time(): static
+    public function distance(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type_ek' => MachineTypeEk::TIME->value,
+            'type_ek' => MachineTypeEk::DISTANCE->value,
         ]);
-    }
-
-    /**
-     * Máquina con propiedades de ejemplo
-     */
-    public function withProperties(): static
-    {
-        return $this->afterCreating(function (Machine $machine) {
-            $machine->properties()->createMany([
-                ['name' => 'Altura del asiento', 'value' => (string) fake()->numberBetween(1, 10), 'unit' => 'cm', 'position' => 0],
-                ['name' => 'Distancia al pecho', 'value' => (string) fake()->numberBetween(20, 60), 'unit' => 'cm', 'position' => 1],
-            ]);
-        });
     }
 }

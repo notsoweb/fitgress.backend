@@ -13,9 +13,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Notsoweb\LaravelCore\Traits\Models\Extended;
 
 /**
- * Propiedad de una máquina del gimnasio
+ * Propiedad de un ejercicio del gimnasio
  *
- * Permite registrar atributos variables por máquina
+ * Permite registrar atributos variables por ejercicio
  * (altura del asiento, distancia al pecho, número de eje, etc.).
  *
  * @author Moisés Cortés C. <soy@mcortes.dev>
@@ -23,13 +23,13 @@ use Notsoweb\LaravelCore\Traits\Models\Extended;
  * @version 1.0.0
  */
 #[Fillable([
-    'machine_id',
+    'exercise_id',
     'name',
     'value',
     'unit',
     'position',
 ])]
-class MachineProperty extends Model
+class ExerciseProperty extends Model
 {
     use Extended,
         HasFactory;
@@ -37,15 +37,15 @@ class MachineProperty extends Model
     /**
      * Tabla asociada al modelo
      */
-    protected $table = 'gym_machine_properties';
+    protected $table = 'gym_exercise_properties';
 
     // Relaciones
 
     /**
-     * Máquina a la que pertenece la propiedad
+     * Ejercicio al que pertenece la propiedad
      */
-    public function machine(): BelongsTo
+    public function exercise(): BelongsTo
     {
-        return $this->belongsTo(Machine::class);
+        return $this->belongsTo(Exercise::class);
     }
 }

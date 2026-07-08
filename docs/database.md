@@ -43,33 +43,45 @@ LogEvent
 
 ```
 User
-└── hasMany Registro (historial de entrenamiento)
+├── hasMany Registro (historial de entrenamiento)
+└── hasMany ExerciseNote
 
 Machine
-├── belongsToMany Plan (gym_plan_machines, pivot position)
-Machine
-├── hasMany MachineProperty (name, value, unit, position)
-├── belongsToMany Plan (gym_plan_machines, pivot position)
+└── hasMany Exercise
+
+Exercise
+├── belongsTo Machine (nullable)
+├── hasMany ExerciseProperty (name, value, unit, position)
+├── hasMany ExerciseNote (user_id, note) [único por user+exercise]
+├── belongsToMany Plan (gym_plan_exercises, pivot position)
 └── hasMany Registro
 
 Plan
-├── belongsToMany Machine (gym_plan_machines, pivot position)
+├── belongsToMany Exercise (gym_plan_exercises, pivot position)
 └── hasMany Registro
 
 Registro
 ├── belongsTo User
-├── belongsTo Machine
+├── belongsTo Exercise
 └── belongsTo Plan (nullable)
 
-MachineProperty
-└── belongsTo Machine
+ExerciseProperty
+└── belongsTo Exercise
+
+ExerciseNote
+├── belongsTo User
+└── belongsTo Exercise
 ```
 
-- `gym_machines`: id, name, description, code (unique), type_ek (enum T/W).
-- `gym_machine_properties`: id, machine_id, name, value (nullable), unit (nullable), position. Índice en `(machine_id, position)`.
+- `gym_machines`: id, name, description, code (unique), type_ek (string R/W/D).
+- `gym_exercises`: id, machine_id (nullable, nullOnDelete), name, description (nullable), type_ek (string, nullable). Índices en `machine_id` y `name`.
+- `gym_exercise_properties`: id, exercise_id, name, value (nullable), unit (nullable), position. Índice en `(exercise_id, position)`.
+- `gym_exercise_notes`: id, user_id, exercise_id, note (text). Único en `(user_id, exercise_id)`.
 - `gym_plans`: id, name, description.
-- `gym_plan_machines`: plan_id, machine_id, position, unique(plan_id, machine_id).
-- `gym_registros`: id, user_id, machine_id, plan_id (nullable), series, reps, weight (nullable), performed_at. Índices en `(user_id, performed_at)` y `machine_id`.
+- `gym_plan_exercises`: plan_id, exercise_id, position, unique(plan_id, exercise_id).
+- `gym_registros`: id, user_id, exercise_id, plan_id (nullable), series (nullable), reps (nullable), weight (nullable), duration (nullable, min), distance (decimal 8,3, km), speed (decimal 6,2, km/h), incline (decimal 5,2, %), performed_at. Índices en `(user_id, performed_at)` y `exercise_id`.
+
+El **tipo efectivo** de un ejercicio es `exercise.type_ek ?? machine.type_ek`; determina qué métricas del registro se validan.
 
 ## Tablas del sistema
 
@@ -85,7 +97,7 @@ MachineProperty
 | `notifications` | `2026_05_17_024231` | Notificaciones in-app |
 | `settings` | `2026_05_17_024320` | Configuración app |
 | `passkeys` | `2026_06_12_155113` | WebAuthn |
-| `gym_machines`, `gym_plans`, `gym_plan_machines`, `gym_registros`, `gym_machine_properties` | `2026_07_02_000001`–`000005` | Módulo Gimnasio |
+| `gym_machines`, `gym_plans`, `gym_exercises`, `gym_plan_exercises`, `gym_registros`, `gym_exercise_properties`, `gym_exercise_notes` | `2026_07_02_000001`–`000007` | Módulo Gimnasio |
 
 ## Seeders
 

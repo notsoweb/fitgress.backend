@@ -35,11 +35,11 @@ class Plan extends Model
     // Relaciones
 
     /**
-     * Máquinas vinculadas al plan (ordenadas por posición)
+     * Ejercicios vinculados al plan (ordenados por posición)
      */
-    public function machines()
+    public function exercises()
     {
-        return $this->belongsToMany(Machine::class, 'gym_plan_machines')
+        return $this->belongsToMany(Exercise::class, 'gym_plan_exercises')
             ->withPivot('position')
             ->orderByPivot('position');
     }

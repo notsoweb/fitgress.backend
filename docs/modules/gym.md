@@ -1,27 +1,44 @@
 # Módulo: Gimnasio (Gym)
 
-Gestión de máquinas, planes de entrenamiento y registros de progreso por usuario.
+Gestión de máquinas (equipo), ejercicios, planes de entrenamiento y registros de progreso por usuario.
 
 ## Dominio
 
-- **Máquina** (`gym_machines`): catálogo de máquinas del gimnasio. `type_ek` distingue máquinas de `WEIGHT` (peso) y `TIME` (tiempo). El campo `weight` del registro se valida según el tipo de la máquina.
-  - **Propiedades** (`gym_machine_properties`): atributos variables por máquina (altura del asiento, distancia al pecho, número de eje, etc.). Cada propiedad tiene `name`, `value` y `unit` (opcional). Se sincronizan desde el mismo endpoint `store`/`update` de la máquina.
-- **Plan** (`gym_plans` + pivot `gym_plan_machines` con `position`): conjunto ordenado de máquinas para una rutina.
-- **Registro** (`gym_registros`): una entrada por sesión/máquina del usuario autenticado con `series`, `reps`, `weight` (nullable) y `performed_at`.
+- **Máquina** (`gym_machines`): catálogo de equipo del gimnasio. Campos `name`, `description`, `code` (único) y `type_ek` (tipo nativo). El `code` de inventario vive aquí, no en el ejercicio.
+- **Ejercicio** (`gym_exercises`): unidad entrenable. `machine_id` (nullable), `name`, `description` (nullable) y `type_ek` (nullable). Una máquina puede tener varios ejercicios. El **tipo efectivo** = `exercise.type_ek ?? machine.type_ek`.
+  - **Propiedades** (`gym_exercise_properties`): atributos variables por ejercicio (altura del asiento, distancia al pecho, número de eje, etc.). `name`, `value` (nullable), `unit` (nullable), `position`. Se sincronizan desde `store`/`update` del ejercicio.
+  - **Notas** (`gym_exercise_notes`): nota persistente por **usuario y ejercicio** (única por `user_id` + `exercise_id`).
+- **Plan** (`gym_plans` + pivot `gym_plan_exercises` con `position`): conjunto ordenado de ejercicios para una rutina.
+- **Registro** (`gym_registros`): una entrada por sesión/ejercicio del usuario autenticado con métricas dependientes del tipo y `performed_at`.
 
-Multiusuario: cada usuario ve solo sus propios registros. Máquinas y planes son compartidos y gestionados por admin/developer.
+Multiusuario: cada usuario ve solo sus propios registros y notas. Máquinas, ejercicios y planes son compartidos y gestionados por admin/developer.
+
+## Tipos de ejercicio (`MachineTypeEk`, string)
+
+| Valor | Tipo | Campos de registro |
+|-------|------|--------------------|
+| `R` | Repeticiones | `series`, `reps` |
+| `W` | Fuerza | `series`, `reps`, `weight` |
+| `D` | Distancia | `duration`, `distance` (requeridos); `speed`, `incline` (opcionales) |
+
+La validación de registros aplica según el **tipo efectivo** del ejercicio. Los campos que no corresponden al tipo son rechazados si vienen presentes.
 
 ## Archivos clave
 
 | Archivo | Rol |
 |---------|-----|
-| `app/Emums/MachineTypeEk.php` | Enum `TIME`/`WEIGHT` |
-| `app/Models/Machine.php`, `MachineProperty.php`, `Plan.php`, `Registro.php` | Modelos Eloquent |
-| `app/Http/Controllers/Gym/MachineController.php` | CRUD máquinas (permisos `machines.*`) |
-| `app/Http/Controllers/Gym/PlanController.php` | CRUD planes + sync máquinas (`plans.*`) |
-| `app/Http/Controllers/Gym/RegistroController.php` | CRUD registros + `charts` (scoped a `Auth::user()`) |
-| `app/Http/Requests/Gym/*` | Validación con autorización vía `hasPermissionTo` |
-| `database/seeders/MachineSeeder.php` | Máquinas de ejemplo |
+| `app/Emums/MachineTypeEk.php` | Enum `REPS`/`WEIGHT`/`DISTANCE` (string) |
+| `app/Models/Machine.php` | Equipo (`hasMany` ejercicios) |
+| `app/Models/Exercise.php` | Ejercicio (`effectiveType()`, append `effective_type`) |
+| `app/Models/ExerciseProperty.php`, `ExerciseNote.php` | Propiedades y notas del ejercicio |
+| `app/Models/Plan.php`, `Registro.php` | Planes y registros (referencian `exercise_id`) |
+| `app/Http/Controllers/Gym/MachineController.php` | CRUD equipo (`machines.*`) |
+| `app/Http/Controllers/Gym/ExerciseController.php` | CRUD ejercicios + propiedades (`exercises.*`) |
+| `app/Http/Controllers/Gym/ExerciseNoteController.php` | Nota por usuario (sin permiso Spatie) |
+| `app/Http/Controllers/Gym/PlanController.php` | CRUD planes + sync ejercicios (`plans.*`) |
+| `app/Http/Controllers/Gym/RegistroController.php` | CRUD registros + `last` + `charts` (scoped a `Auth::user()`) |
+| `app/Http/Requests/Gym/*` | Validación; `ValidatesRegistroByType` centraliza reglas por tipo |
+| `database/seeders/MachineSeeder.php` | Máquinas y ejercicios de ejemplo |
 
 ## Rutas API
 
@@ -34,66 +51,70 @@ Todas requieren `auth:api`. Prefijo `/api/gym`.
 | GET | `/gym/machines/{machine}` | `gym.machines.show` | `machines.index` | Ver |
 | PUT/PATCH | `/gym/machines/{machine}` | `gym.machines.update` | `machines.edit` | Editar |
 | DELETE | `/gym/machines/{machine}` | `gym.machines.destroy` | `machines.destroy` | Eliminar |
-| GET | `/gym/plans` | `gym.plans.index` | `plans.index` | Listado paginado (con `machines`) |
+| GET | `/gym/exercises` | `gym.exercises.index` | `exercises.index` | Listado paginado (con `machine`, `properties`, `effective_type`) |
+| POST | `/gym/exercises` | `gym.exercises.store` | `exercises.create` | Crear (`{name, description?, machine_id?, type_ek?, properties[]}`) |
+| GET | `/gym/exercises/{exercise}` | `gym.exercises.show` | `exercises.index` | Ver (con `machine` + `properties`) |
+| PUT/PATCH | `/gym/exercises/{exercise}` | `gym.exercises.update` | `exercises.edit` | Editar |
+| DELETE | `/gym/exercises/{exercise}` | `gym.exercises.destroy` | `exercises.destroy` | Eliminar |
+| GET | `/gym/exercises/{exercise}/note` | `gym.exercises.note` | — | Nota del usuario `{ note: string\|null }` |
+| PUT | `/gym/exercises/{exercise}/note` | `gym.exercises.note.upsert` | — | Upsert nota `{ note }` → `{ note }` (vacío elimina) |
+| GET | `/gym/plans` | `gym.plans.index` | `plans.index` | Listado paginado (con `exercises`) |
 | POST | `/gym/plans` | `gym.plans.store` | `plans.create` | Crear |
-| GET | `/gym/plans/{plan}` | `gym.plans.show` | `plans.index` | Ver (con máquinas) |
+| GET | `/gym/plans/{plan}` | `gym.plans.show` | `plans.index` | Ver (con ejercicios + máquina + propiedades) |
 | PUT/PATCH | `/gym/plans/{plan}` | `gym.plans.update` | `plans.edit` | Editar nombre/descripción |
 | DELETE | `/gym/plans/{plan}` | `gym.plans.destroy` | `plans.destroy` | Eliminar |
-| GET | `/gym/plans/{plan}/machines` | `gym.plans.machines` | `plans.index` | Máquinas ordenadas |
-| PUT | `/gym/plans/{plan}/machines` | `gym.plans.machines.sync` | `plans.edit` | Sincronizar máquinas + posición |
-| GET | `/gym/registros` | `gym.registros.index` | — | Listado del usuario (filtros `machine_id`, `plan_id`, `from`, `to`) |
-| POST | `/gym/registros` | `gym.registros.store` | — | Crear (omite permiso; `weight` obligatorio si máquina es WEIGHT) |
-| GET | `/gym/registros/charts` | `gym.registros.charts` | — | Serie `[{performed_at, value}]` por `machine_id` y `metric` (`weight|reps|series`) |
+| GET | `/gym/plans/{plan}/exercises` | `gym.plans.exercises` | `plans.index` | Ejercicios ordenados |
+| PUT | `/gym/plans/{plan}/exercises` | `gym.plans.exercises.sync` | `plans.edit` | Sincronizar ejercicios + posición |
+| GET | `/gym/registros/last` | `gym.registros.last` | — | Último registro + nota `{ model, note }` por `exercise_id` |
+| GET | `/gym/registros/charts` | `gym.registros.charts` | — | Serie por `exercise_id` y `metric`; métricas por defecto según tipo |
+| GET | `/gym/registros` | `gym.registros.index` | — | Listado del usuario (filtros `exercise_id`, `plan_id`, `from`, `to`) |
+| POST | `/gym/registros` | `gym.registros.store` | — | Crear (validación por tipo efectivo) |
 | GET | `/gym/registros/{registro}` | `gym.registros.show` | — | Ver (autorización por `user_id`) |
 | PUT/PATCH | `/gym/registros/{registro}` | `gym.registros.update` | — | Editar (autorización por `user_id`) |
 | DELETE | `/gym/registros/{registro}` | `gym.registros.destroy` | — | Eliminar (autorización por `user_id`) |
+
+> `registros/last` y `registros/charts` se declaran **antes** de `apiResource('registros')` para evitar colisión con `registros/{registro}`.
 
 ## Permisos Spatie
 
 Definidos en `RoleSeeder` bajo el tipo `Gimnasio`:
 
 - `machines.{index,create,edit,destroy}`
+- `exercises.{index,create,edit,destroy}`
 - `plans.{index,create,edit,destroy}`
 
-Los registros NO requieren permiso Spatie: cualquier usuario autenticado puede crear/editar/eliminar **sus** registros.
+Los registros y las notas NO requieren permiso Spatie: cualquier usuario autenticado gestiona **sus** registros y **sus** notas (scoped por `user_id`).
+
+## `effective_type`
+
+El modelo `Exercise` expone el atributo calculado `effective_type` (append) = `type_ek ?? machine?->type_ek` (como cadena `R`/`W`/`D` o `null`). El frontend lo consume directamente; además se serializan `type_ek` y `machine`.
 
 ## Modelo de datos
 
 ```
-User 1─N Registro N─1 Machine
-                          │
-                          ├── 1─N MachineProperty (name, value, unit, position)
-                          │
-                          └── N─M ── Plan (pivot gym_plan_machines.position)
-                                    │
-                                    └── 1─N Registro (nullable)
+Machine 1─N Exercise
+                  ├── 1─N ExerciseProperty (name, value, unit, position)
+                  ├── 1─N ExerciseNote (user_id, note)  [único por user+exercise]
+                  ├── N─M Plan (pivot gym_plan_exercises.position)
+                  └── 1─N Registro
+User 1─N Registro N─1 Exercise
+User 1─N ExerciseNote
+Plan 1─N Registro (nullable)
 ```
-
-### Propiedades de máquina
-
-En lugar de un campo fijo de altura, cada máquina puede tener propiedades arbitrarias que describen su configuración física:
-
-| Campo | Tipo | Descripción |
-|-------|------|-------------|
-| `name` | string | Nombre de la propiedad (ej. "Altura del asiento", "Distancia al pecho", "Número de eje") |
-| `value` | string (nullable) | Valor (ej. "3", "150", "45°") |
-| `unit` | string (nullable) | Unidad opcional (ej. "cm", "nivel", "°", "%") |
-| `position` | int | Orden de visualización |
-
-Se envían como array `properties[]` en `POST /api/gym/machines` y `PUT /api/gym/machines/{machine}`. El controlador elimina las existentes y reemplaza por las nuevas. Los endpoints `index` y `show` incluyen las propiedades eager-loaded.
 
 ## Flujo "Modo Registro"
 
 1. `GET /api/gym/plans` → usuario elige un plan.
-2. `GET /api/gym/plans/{plan}/machines` → máquinas en orden de ejecución.
-3. Por cada máquina: `POST /api/gym/registros` con `{machine_id, plan_id, series, reps, weight, performed_at}`.
-4. `GET /api/gym/registros?machine_id=…&from=…&to=…` → historial.
-5. `GET /api/gym/registros/charts?machine_id=…&metric=weight` → serie para gráfica de progreso.
+2. `GET /api/gym/plans/{plan}/exercises` → ejercicios en orden de ejecución.
+3. Al seleccionar un ejercicio: `GET /api/gym/registros/last?exercise_id=…` → prellena el último registro y muestra la nota.
+4. `POST /api/gym/registros` con los campos del tipo efectivo (`{exercise_id, plan_id, ...métricas, performed_at}`).
+5. `GET /api/gym/registros?exercise_id=…&from=…&to=…` → historial.
+6. `GET /api/gym/registros/charts?exercise_id=…&metric=weight` → serie para gráfica de progreso.
 
 ## Tests
 
-`tests/Feature/MachineTest.php`, `PlanTest.php`, `RegistroTest.php` cubren CRUD, autorización por permiso, scoped multiusuario y validación condicional de `weight`.
+`tests/Feature/ExerciseTest.php`, `ExerciseNoteTest.php`, `MachineTest.php`, `PlanTest.php`, `RegistroTest.php` cubren CRUD, autorización por permiso, scoped multiusuario, `effective_type`, validación por tipo (R/W/D), `last` y notas.
 
 ```
-php artisan test --compact --filter="(MachineTest|PlanTest|RegistroTest)"
+php artisan test --compact --filter="(ExerciseTest|ExerciseNoteTest|MachineTest|PlanTest|RegistroTest)"
 ```

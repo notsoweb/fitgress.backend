@@ -6,8 +6,7 @@ namespace App\Http\Requests\Gym;
  * @copyright (c) 2026 Mdev (https://mcortes.dev) - All rights reserved.
  */
 
-use App\Emums\MachineTypeEk;
-use App\Models\Machine;
+use App\Models\Exercise;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
@@ -17,10 +16,12 @@ use Illuminate\Validation\Validator;
  *
  * @author Moisés Cortés C. <soy@mcortes.dev>
  *
- * @version 1.0.0
+ * @version 2.0.0
  */
 class RegistroUpdateRequest extends FormRequest
 {
+    use ValidatesRegistroByType;
+
     /**
      * Determinar si el usuario está autorizado para realizar esta solicitud
      */
@@ -32,25 +33,11 @@ class RegistroUpdateRequest extends FormRequest
     }
 
     /**
-     * Configurar el validador después de las reglas base
+     * Configurar el validador según el tipo efectivo del ejercicio
      */
     public function withValidator(Validator $validator): void
     {
-        $validator->after(function (Validator $validator) {
-            $machine = Machine::find($this->input('machine_id'));
-
-            if (! $machine) {
-                return;
-            }
-
-            if ($machine->type_ek === MachineTypeEk::WEIGHT && $this->filled('weight') === false) {
-                $validator->errors()->add('weight', __('validation.required', ['attribute' => 'weight']));
-            }
-
-            if ($machine->type_ek === MachineTypeEk::TIME && $this->filled('weight') === true) {
-                $validator->errors()->add('weight', __('gym.registros.weight_not_allowed'));
-            }
-        });
+        $this->validateByType($validator, Exercise::find($this->input('exercise_id')));
     }
 
     /**
@@ -60,13 +47,10 @@ class RegistroUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'machine_id' => ['required', 'integer', Rule::exists('gym_machines', 'id')],
+        return array_merge([
+            'exercise_id' => ['required', 'integer', Rule::exists('gym_exercises', 'id')],
             'plan_id' => ['nullable', 'integer', Rule::exists('gym_plans', 'id')],
-            'series' => ['required', 'integer', 'min:1', 'max:100'],
-            'reps' => ['required', 'integer', 'min:1', 'max:1000'],
-            'weight' => ['nullable', 'numeric', 'min:0', 'max:2000'],
             'performed_at' => ['required', 'date'],
-        ];
+        ], $this->metricRules());
     }
 }

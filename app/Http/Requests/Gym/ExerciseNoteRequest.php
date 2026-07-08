@@ -7,23 +7,22 @@ namespace App\Http\Requests\Gym;
  */
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 /**
- * Sincronizar máquinas de un plan
+ * Guardar nota de un ejercicio para el usuario autenticado
  *
  * @author Moisés Cortés C. <soy@mcortes.dev>
  *
  * @version 1.0.0
  */
-class PlanSyncMachinesRequest extends FormRequest
+class ExerciseNoteRequest extends FormRequest
 {
     /**
      * Determinar si el usuario está autorizado para realizar esta solicitud
      */
     public function authorize(): bool
     {
-        return $this->user()->hasPermissionTo('plans.edit');
+        return true;
     }
 
     /**
@@ -34,9 +33,7 @@ class PlanSyncMachinesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'machines' => ['required', 'array', 'min:1'],
-            'machines.*.id' => ['required', 'integer', Rule::exists('gym_machines', 'id')],
-            'machines.*.position' => ['required', 'integer', 'min:0'],
+            'note' => ['nullable', 'string', 'max:2000'],
         ];
     }
 }

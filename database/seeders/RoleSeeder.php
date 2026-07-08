@@ -82,6 +82,13 @@ class RoleSeeder extends Seeder
         ] = $this->onCRUD('machines', $gym, 'api');
 
         [
+            $exerciseIndex,
+            $exerciseCreate,
+            $exerciseEdit,
+            $exerciseDestroy
+        ] = $this->onCRUD('exercises', $gym, 'api');
+
+        [
             $planIndex,
             $planCreate,
             $planEdit,
@@ -123,6 +130,10 @@ class RoleSeeder extends Seeder
             $machineCreate,
             $machineEdit,
             $machineDestroy,
+            $exerciseIndex,
+            $exerciseCreate,
+            $exerciseEdit,
+            $exerciseDestroy,
             $planIndex,
             $planCreate,
             $planEdit,

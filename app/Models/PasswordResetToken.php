@@ -1,4 +1,7 @@
-<?php namespace App\Models;
+<?php
+
+namespace App\Models;
+
 /**
  * @copyright (c) 2026 Mdev (https://mcortes.dev) - All rights reserved.
  */
@@ -9,23 +12,25 @@ use Ramsey\Uuid\Uuid;
 
 /**
  * Token de reseteo de contraseña
- * 
+ *
  * @author Moisés Cortés C. <soy@mcortes.dev>
- * 
+ *
  * @version 1.0.0
  */
 #[Fillable([
     'user_id',
- ])]
+])]
 class PasswordResetToken extends Model
 {
     /**
      * Configuración del modelo
      */
     protected $primaryKey = 'uuid';
+
     protected $keyType = 'string';
+
     public $incrementing = false;
-    
+
     /**
      * Desactivar fecha actualización
      */
@@ -41,7 +46,7 @@ class PasswordResetToken extends Model
         });
     }
 
-    # Relaciones
+    // Relaciones
 
     /**
      * Un token de reseteo de contraseña pertenece a un usuario

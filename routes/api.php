@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Gym\ExerciseController;
+use App\Http\Controllers\Gym\ExerciseNoteController;
 use App\Http\Controllers\Gym\MachineController;
 use App\Http\Controllers\Gym\PlanController;
 use App\Http\Controllers\Gym\RegistroController;
@@ -28,9 +30,16 @@ include 'core.php';
  */
 Route::middleware('auth:api')->name('gym.')->prefix('gym')->group(function () {
     Route::apiResource('machines', MachineController::class);
+
+    Route::get('exercises/{exercise}/note', [ExerciseNoteController::class, 'show'])->name('exercises.note');
+    Route::put('exercises/{exercise}/note', [ExerciseNoteController::class, 'upsert'])->name('exercises.note.upsert');
+    Route::apiResource('exercises', ExerciseController::class);
+
     Route::apiResource('plans', PlanController::class);
-    Route::get('plans/{plan}/machines', [PlanController::class, 'machines'])->name('plans.machines');
-    Route::put('plans/{plan}/machines', [PlanController::class, 'syncMachines'])->name('plans.machines.sync');
+    Route::get('plans/{plan}/exercises', [PlanController::class, 'exercises'])->name('plans.exercises');
+    Route::put('plans/{plan}/exercises', [PlanController::class, 'syncExercises'])->name('plans.exercises.sync');
+
+    Route::get('registros/last', [RegistroController::class, 'last'])->name('registros.last');
     Route::get('registros/charts', [RegistroController::class, 'charts'])->name('registros.charts');
     Route::apiResource('registros', RegistroController::class);
 });

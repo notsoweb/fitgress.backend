@@ -11,13 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('gym_machines', function (Blueprint $table) {
+        Schema::create('gym_exercise_properties', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('exercise_id')->constrained('gym_exercises')->cascadeOnDelete();
             $table->string('name');
-            $table->string('description')->nullable();
-            $table->string('code')->unique();
-            $table->string('type_ek');
+            $table->string('value')->nullable();
+            $table->string('unit')->nullable();
+            $table->unsignedSmallInteger('position')->default(0);
             $table->timestamps();
+
+            $table->index(['exercise_id', 'position']);
         });
     }
 
@@ -26,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('gym_machines');
+        Schema::dropIfExists('gym_exercise_properties');
     }
 };

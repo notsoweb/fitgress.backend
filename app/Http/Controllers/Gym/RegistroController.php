@@ -10,7 +10,8 @@ use App\Emums\MachineTypeEk;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Gym\RegistroStoreRequest;
 use App\Http\Requests\Gym\RegistroUpdateRequest;
-use App\Models\Machine;
+use App\Models\Exercise;
+use App\Models\ExerciseNote;
 use App\Models\Registro;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -23,21 +24,28 @@ use Notsoweb\ApiResponse\Enums\ApiResponse;
  *
  * @author Moisés Cortés C. <soy@mcortes.dev>
  *
- * @version 1.0.0
+ * @version 2.0.0
  */
 class RegistroController extends Controller
 {
+    /**
+     * Métricas disponibles para las gráficas de progreso
+     *
+     * @var array<int, string>
+     */
+    private const METRICS = ['series', 'reps', 'weight', 'duration', 'distance', 'speed', 'incline'];
+
     /**
      * Listar registros del usuario autenticado
      */
     public function index(Request $request)
     {
         $models = Registro::forUser()
-            ->with(['machine:id,name,code,type_ek', 'plan:id,name'])
+            ->with(['exercise:id,machine_id,name,type_ek', 'exercise.machine:id,name,code,type_ek', 'plan:id,name'])
             ->orderByDesc('performed_at');
 
-        if ($request->filled('machine_id')) {
-            $models->where('machine_id', $request->integer('machine_id'));
+        if ($request->filled('exercise_id')) {
+            $models->where('exercise_id', $request->integer('exercise_id'));
         }
 
         if ($request->filled('plan_id')) {
@@ -77,7 +85,11 @@ class RegistroController extends Controller
         }
 
         return ApiResponse::OK->response([
-            'model' => $registro->load(['machine:id,name,code,type_ek', 'plan:id,name']),
+            'model' => $registro->load([
+                'exercise:id,machine_id,name,type_ek',
+                'exercise.machine:id,name,code,type_ek',
+                'plan:id,name',
+            ]),
         ]);
     }
 
@@ -108,34 +120,66 @@ class RegistroController extends Controller
     }
 
     /**
+     * Último registro del usuario para un ejercicio + su nota persistente
+     *
+     * Query params:
+     * - `exercise_id` (required): ejercicio
+     */
+    public function last(Request $request)
+    {
+        $request->validate([
+            'exercise_id' => ['required', 'integer', 'exists:gym_exercises,id'],
+        ]);
+
+        $exerciseId = $request->integer('exercise_id');
+
+        $model = Registro::forUser()
+            ->where('exercise_id', $exerciseId)
+            ->orderByDesc('performed_at')
+            ->first();
+
+        $note = ExerciseNote::query()
+            ->where('user_id', auth()->id())
+            ->where('exercise_id', $exerciseId)
+            ->value('note');
+
+        return ApiResponse::OK->response([
+            'model' => $model,
+            'note' => $note,
+        ]);
+    }
+
+    /**
      * Serie temporal para gráficas de progreso
      *
      * Query params:
-     * - `machine_id` (required): máquina
-     * - `metric` (optional): `weight|reps|series`. Si se omite se retornan todas las métricas combinadas.
+     * - `exercise_id` (required): ejercicio
+     * - `metric` (optional): una de `series,reps,weight,duration,distance,speed,incline`.
+     *   Si se omite se retornan las métricas por defecto del tipo efectivo.
      * - `from`, `to` (optional): rango de fechas
      */
     public function charts(Request $request)
     {
         $request->validate([
-            'machine_id' => ['required', 'integer', 'exists:gym_machines,id'],
-            'metric' => ['nullable', 'in:weight,reps,series'],
+            'exercise_id' => ['required', 'integer', 'exists:gym_exercises,id'],
+            'metric' => ['nullable', 'in:'.implode(',', self::METRICS)],
             'from' => ['nullable', 'date'],
             'to' => ['nullable', 'date'],
         ]);
 
-        $machine = Machine::findOrFail($request->integer('machine_id'), ['id', 'name', 'code', 'type_ek']);
+        $exercise = Exercise::with('machine:id,name,code,type_ek')
+            ->findOrFail($request->integer('exercise_id'), ['id', 'machine_id', 'name', 'type_ek']);
 
         $rows = Registro::forUser()
-            ->where('machine_id', $request->integer('machine_id'))
+            ->where('exercise_id', $exercise->id)
             ->when($request->filled('from'), fn (Builder $q) => $q->where('performed_at', '>=', $request->input('from')))
             ->when($request->filled('to'), fn (Builder $q) => $q->where('performed_at', '<=', $request->input('to')))
             ->orderBy('performed_at')
-            ->get(['performed_at', 'series', 'reps', 'weight']);
+            ->get(array_merge(['performed_at'], self::METRICS));
 
         $metrics = $request->filled('metric')
             ? [$request->input('metric')]
-            : array_filter(['series', 'reps', 'weight'], fn (string $m) => $m !== 'weight' ? true : $machine->type_ek === MachineTypeEk::WEIGHT);
+            : $this->defaultMetrics($exercise->effectiveType());
 
         $series = array_map(function (string $metric) use ($rows) {
             return [
@@ -148,9 +192,23 @@ class RegistroController extends Controller
         }, $metrics);
 
         return ApiResponse::OK->response([
-            'machine' => $machine,
+            'exercise' => $exercise,
             'metrics' => $metrics,
             'series' => $series,
         ]);
+    }
+
+    /**
+     * Métricas por defecto según el tipo efectivo del ejercicio
+     *
+     * @return array<int, string>
+     */
+    private function defaultMetrics(?MachineTypeEk $type): array
+    {
+        return match ($type) {
+            MachineTypeEk::WEIGHT => ['series', 'reps', 'weight'],
+            MachineTypeEk::DISTANCE => ['duration', 'distance', 'speed', 'incline'],
+            default => ['series', 'reps'],
+        };
     }
 }

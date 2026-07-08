@@ -1,4 +1,7 @@
-<?php namespace App\Models;
+<?php
+
+namespace App\Models;
+
 /**
  * @copyright (c) 2026 Mdev (https://mcortes.dev) - All rights reserved.
  */
@@ -10,22 +13,22 @@ use Spatie\Permission\Models\Permission;
 
 /**
  * Tipos de permisos
- * 
+ *
  * Agrupa permisos bajo un nombre común.
- * 
+ *
  * @author Moisés Cortés C. <soy@mcortes.dev>
- * 
+ *
  * @version 1.0.0
  */
 #[Fillable([
     'name',
     'description',
- ])]
+])]
 class PermissionType extends Model
 {
     use Extended;
 
-    # Relaciones
+    // Relaciones
 
     /**
      * Un tipo de permiso tiene muchos permisos

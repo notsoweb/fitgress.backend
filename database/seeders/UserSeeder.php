@@ -1,4 +1,7 @@
-<?php namespace Database\Seeders;
+<?php
+
+namespace Database\Seeders;
+
 /**
  * @copyright (c) 2026 Mdev (https://mcortes.dev) - All rights reserved.
  */
@@ -10,9 +13,9 @@ use Notsoweb\LaravelCore\Supports\UserSecureSupport;
 
 /**
  * Usuarios predeterminados del sistema
- * 
+ *
  * @author Moisés Cortés C. <soy@mcortes.dev>
- * 
+ *
  * @version 1.0.0
  */
 class UserSeeder extends Seeder

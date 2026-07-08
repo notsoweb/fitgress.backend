@@ -1,4 +1,7 @@
-<?php namespace App\Models;
+<?php
+
+namespace App\Models;
+
 /**
  * @copyright (c) 2026 Mdev (https://mcortes.dev) - All rights reserved.
  */
@@ -10,9 +13,9 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Historial de eventos
- * 
+ *
  * @author Moisés Cortés C. <soy@mcortes.dev>
- * 
+ *
  * @version 1.0.0
  */
 #[Fillable([
@@ -21,11 +24,11 @@ use Illuminate\Database\Eloquent\Model;
     'data',
     'reportable_id',
     'reportable_type',
-    'user_id'
- ])]
+    'user_id',
+])]
 #[Appends([
-    'description'
- ])]
+    'description',
+])]
 class LogEvent extends Model
 {
     /**
@@ -39,7 +42,7 @@ class LogEvent extends Model
     protected function casts(): array
     {
         return [
-            'data' => 'json'
+            'data' => 'json',
         ];
     }
 
@@ -54,10 +57,10 @@ class LogEvent extends Model
     /**
      * Descripción del evento
      */
-    public function description() : Attribute
+    public function description(): Attribute
     {
         return Attribute::make(
-            get: fn() => __($this->event, ['model' => $this->name]),
+            get: fn () => __($this->event, ['model' => $this->name]),
         );
     }
 
@@ -74,7 +77,7 @@ class LogEvent extends Model
      */
     public static function report(Model $model, string $event, string $key = 'name', bool $reportChanges = false)
     {
-        $event = strtolower(explode('\\', get_class($model))[2]) . '.' . $event;
+        $event = strtolower(explode('\\', get_class($model))[2]).'.'.$event;
 
         self::create([
             'event' => $event,
@@ -82,7 +85,7 @@ class LogEvent extends Model
             'data' => $reportChanges ? $model->getContrastChanges() : $model->fillableToArray(),
             'reportable_id' => $model->id,
             'reportable_type' => get_class($model),
-            'user_id' => auth()?->user()?->id
+            'user_id' => auth()?->user()?->id,
         ]);
     }
 }

@@ -23,7 +23,7 @@ API REST construida con **Laravel 13** sobre el boilerplate **Argos** (`notsoweb
 | Recursos y metadatos | [modules/resources.md](./modules/resources.md) |
 | Notificaciones y broadcasting | [modules/notifications.md](./modules/notifications.md) |
 | Agentes de IA (`laravel/ai`) | [modules/ai-agents.md](./modules/ai-agents.md) |
-| Gimnasio (máquinas, planes, registros) | [modules/gym.md](./modules/gym.md) |
+| Gimnasio (máquinas, ejercicios, planes, registros, notas) | [modules/gym.md](./modules/gym.md) |
 
 ## Información del proyecto
 

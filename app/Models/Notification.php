@@ -1,4 +1,7 @@
-<?php namespace App\Models;
+<?php
+
+namespace App\Models;
+
 /**
  * @copyright (c) 2026 Mdev (https://mcortes.dev) - All rights reserved.
  */
@@ -11,9 +14,9 @@ use Illuminate\Notifications\DatabaseNotificationCollection;
 
 /**
  * Notificaciones de usuario
- * 
+ *
  * @author Moisés Cortés C. <soy@mcortes.dev>
- * 
+ *
  * @version 1.0.0
  */
 #[Fillable([
@@ -23,7 +26,7 @@ use Illuminate\Notifications\DatabaseNotificationCollection;
     'read_at',
     'is_closed',
     'user_id',
- ])]
+])]
 class Notification extends Model
 {
     use HasCollection;
@@ -56,7 +59,7 @@ class Notification extends Model
         ];
     }
 
-    # Relaciones
+    // Relaciones
 
     /**
      * Relación polimórfica
@@ -74,7 +77,7 @@ class Notification extends Model
         return $this->belongsTo(User::class);
     }
 
-    # Acciones
+    // Acciones
 
     /**
      * Marcar notificación como leída
@@ -90,7 +93,7 @@ class Notification extends Model
 
     /**
      * Marcar como cerrado
-     * 
+     *
      * Usado en casos donde se ignora la notificación y no se desea ver en
      * la vista de notificaciones.
      *
@@ -103,32 +106,26 @@ class Notification extends Model
 
     /**
      * Marcar como no leído
-     *
-     * @return void
      */
-    public function markAsUnread() : void
+    public function markAsUnread(): void
     {
-        if (!is_null($this->read_at)) {
+        if (! is_null($this->read_at)) {
             $this->forceFill(['read_at' => null])->save();
         }
     }
 
     /**
      * Determinar si una notificación ha sido leída
-     *
-     * @return bool
      */
-    public function read() : bool
+    public function read(): bool
     {
         return $this->read_at !== null;
     }
 
     /**
      * Determinar si una notificación no ha sido leída
-     *
-     * @return bool
      */
-    public function unread() : bool
+    public function unread(): bool
     {
         return $this->read_at === null;
     }
@@ -136,8 +133,8 @@ class Notification extends Model
     /**
      * Filtrar notificaciones leídas
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<static>  $query
-     * @return \Illuminate\Database\Eloquent\Builder<static>
+     * @param  Builder<static>  $query
+     * @return Builder<static>
      */
     public function scopeRead(Builder $query)
     {

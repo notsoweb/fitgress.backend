@@ -8,7 +8,7 @@ namespace App\Http\Controllers\Gym;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Gym\PlanStoreRequest;
-use App\Http\Requests\Gym\PlanSyncMachinesRequest;
+use App\Http\Requests\Gym\PlanSyncExercisesRequest;
 use App\Http\Requests\Gym\PlanUpdateRequest;
 use App\Models\Plan;
 use App\Supports\QuerySupport;
@@ -32,9 +32,9 @@ class PlanController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            self::can('plans.index', ['index', 'show', 'machines']),
+            self::can('plans.index', ['index', 'show', 'exercises']),
             self::can('plans.create', ['store']),
-            self::can('plans.edit', ['update', 'syncMachines']),
+            self::can('plans.edit', ['update', 'syncExercises']),
             self::can('plans.destroy', ['destroy']),
         ];
     }
@@ -44,7 +44,8 @@ class PlanController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        $models = Plan::with('machines:id,name,code,type_ek')->orderBy('name');
+        $models = Plan::with(['exercises:id,machine_id,name,type_ek', 'exercises.machine:id,name,code,type_ek'])
+            ->orderBy('name');
 
         QuerySupport::queryByKeys($models, ['name', 'description']);
 
@@ -69,7 +70,11 @@ class PlanController extends Controller implements HasMiddleware
     public function show(Plan $plan)
     {
         return ApiResponse::OK->response([
-            'model' => $plan->load('machines:id,name,code,type_ek', 'machines.properties'),
+            'model' => $plan->load([
+                'exercises:id,machine_id,name,description,type_ek',
+                'exercises.machine:id,name,code,type_ek',
+                'exercises.properties',
+            ]),
         ]);
     }
 
@@ -96,34 +101,40 @@ class PlanController extends Controller implements HasMiddleware
     }
 
     /**
-     * Máquinas de un plan (ordenadas por posición)
+     * Ejercicios de un plan (ordenados por posición)
      */
-    public function machines(Plan $plan)
+    public function exercises(Plan $plan)
     {
         return ApiResponse::OK->response([
-            'machines' => $plan->machines()
-                ->with('properties')
-                ->get(['gym_machines.id', 'name', 'code', 'type_ek']),
+            'exercises' => $this->loadExercises($plan),
         ]);
     }
 
     /**
-     * Sincronizar máquinas del plan con sus posiciones
+     * Sincronizar ejercicios del plan con sus posiciones
      */
-    public function syncMachines(PlanSyncMachinesRequest $request, Plan $plan)
+    public function syncExercises(PlanSyncExercisesRequest $request, Plan $plan)
     {
         $sync = [];
 
-        foreach ($request->input('machines', []) as $item) {
+        foreach ($request->input('exercises', []) as $item) {
             $sync[$item['id']] = ['position' => $item['position']];
         }
 
-        $plan->machines()->sync($sync);
+        $plan->exercises()->sync($sync);
 
         return ApiResponse::OK->response([
-            'machines' => $plan->machines()
-                ->with('properties')
-                ->get(['gym_machines.id', 'name', 'code', 'type_ek']),
+            'exercises' => $this->loadExercises($plan),
         ]);
+    }
+
+    /**
+     * Cargar los ejercicios del plan con máquina y propiedades
+     */
+    private function loadExercises(Plan $plan)
+    {
+        return $plan->exercises()
+            ->with(['machine:id,name,code,type_ek', 'properties'])
+            ->get(['gym_exercises.id', 'machine_id', 'name', 'description', 'type_ek']);
     }
 }

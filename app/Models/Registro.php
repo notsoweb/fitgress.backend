@@ -22,11 +22,15 @@ use Notsoweb\LaravelCore\Traits\Models\Extended;
  */
 #[Fillable([
     'user_id',
-    'machine_id',
+    'exercise_id',
     'plan_id',
     'series',
     'reps',
     'weight',
+    'duration',
+    'distance',
+    'speed',
+    'incline',
     'performed_at',
 ])]
 class Registro extends Model
@@ -49,6 +53,9 @@ class Registro extends Model
         return [
             'performed_at' => 'datetime',
             'weight' => 'decimal:3',
+            'distance' => 'decimal:3',
+            'speed' => 'decimal:2',
+            'incline' => 'decimal:2',
         ];
     }
 
@@ -75,11 +82,11 @@ class Registro extends Model
     }
 
     /**
-     * Máquina usada en el registro
+     * Ejercicio realizado en el registro
      */
-    public function machine(): BelongsTo
+    public function exercise(): BelongsTo
     {
-        return $this->belongsTo(Machine::class);
+        return $this->belongsTo(Exercise::class);
     }
 
     /**

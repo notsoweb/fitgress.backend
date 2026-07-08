@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('gym_machines', function (Blueprint $table) {
+        Schema::create('gym_exercise_notes', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('description')->nullable();
-            $table->string('code')->unique();
-            $table->string('type_ek');
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('exercise_id')->constrained('gym_exercises')->cascadeOnDelete();
+            $table->text('note');
             $table->timestamps();
+
+            $table->unique(['user_id', 'exercise_id']);
         });
     }
 
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('gym_machines');
+        Schema::dropIfExists('gym_exercise_notes');
     }
 };

@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('gym_plan_machines', function (Blueprint $table) {
+        Schema::create('gym_plan_exercises', function (Blueprint $table) {
             $table->id();
             $table->foreignId('plan_id')->constrained('gym_plans')->cascadeOnDelete();
-            $table->foreignId('machine_id')->constrained('gym_machines')->cascadeOnDelete();
+            $table->foreignId('exercise_id')->constrained('gym_exercises')->cascadeOnDelete();
             $table->unsignedInteger('position')->default(0);
 
-            $table->unique(['plan_id', 'machine_id']);
+            $table->unique(['plan_id', 'exercise_id']);
             $table->index(['plan_id', 'position']);
         });
     }
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('gym_plan_machines');
+        Schema::dropIfExists('gym_plan_exercises');
     }
 };
