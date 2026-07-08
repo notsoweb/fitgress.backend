@@ -58,6 +58,16 @@ class ExerciseFactory extends Factory
     }
 
     /**
+     * Ejercicio de tipo tiempo (isométrico)
+     */
+    public function time(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'type_ek' => MachineTypeEk::TIME->value,
+        ]);
+    }
+
+    /**
      * Ejercicio asociado a una máquina; hereda su tipo (type_ek nulo)
      */
     public function forMachine(Machine $machine): static

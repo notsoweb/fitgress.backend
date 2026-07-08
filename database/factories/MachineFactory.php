@@ -55,4 +55,14 @@ class MachineFactory extends Factory
             'type_ek' => MachineTypeEk::DISTANCE->value,
         ]);
     }
+
+    /**
+     * Máquina de tipo tiempo (isométrico)
+     */
+    public function time(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'type_ek' => MachineTypeEk::TIME->value,
+        ]);
+    }
 }

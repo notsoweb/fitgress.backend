@@ -128,6 +128,48 @@ class RegistroTest extends TestCase
         ])->assertStatus(422);
     }
 
+    public function test_user_can_create_time_registro(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->create();
+        $exercise = Exercise::factory()->time()->create();
+
+        $this->actingAs($user, 'api')->postJson('/api/gym/registros', [
+            'exercise_id' => $exercise->id,
+            'series' => 3,
+            'duration' => 50,
+            'performed_at' => '2026-07-02 10:00:00',
+        ])->assertStatus(201);
+
+        $this->assertDatabaseHas('gym_registros', [
+            'exercise_id' => $exercise->id,
+            'series' => 3,
+            'duration' => 50,
+            'reps' => null,
+            'weight' => null,
+            'distance' => null,
+        ]);
+    }
+
+    public function test_time_registro_rejects_other_metrics(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->create();
+        $exercise = Exercise::factory()->time()->create();
+
+        $this->actingAs($user, 'api')->postJson('/api/gym/registros', [
+            'exercise_id' => $exercise->id,
+            'series' => 3,
+            'duration' => 50,
+            'reps' => 12,
+            'weight' => 10,
+            'distance' => 1.2,
+            'speed' => 8,
+            'incline' => 5,
+            'performed_at' => '2026-07-02 10:00:00',
+        ])->assertStatus(422);
+    }
+
     public function test_effective_type_from_machine_is_used_for_validation(): void
     {
         $user = User::factory()->create();
@@ -263,6 +305,19 @@ class RegistroTest extends TestCase
         $response = $this->actingAs($user, 'api')->getJson('/api/gym/registros/charts?exercise_id='.$exercise->id);
 
         $response->assertOk()->assertJsonPath('data.metrics', ['duration', 'distance', 'speed', 'incline']);
+    }
+
+    public function test_charts_default_metrics_for_time_type(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->create();
+        $exercise = Exercise::factory()->time()->create();
+
+        Registro::factory()->forExercise($exercise, $user)->create();
+
+        $response = $this->actingAs($user, 'api')->getJson('/api/gym/registros/charts?exercise_id='.$exercise->id);
+
+        $response->assertOk()->assertJsonPath('data.metrics', ['series', 'duration']);
     }
 
     public function test_charts_default_metrics_for_reps_type(): void

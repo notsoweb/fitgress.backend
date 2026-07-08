@@ -65,6 +65,19 @@ Todas las llamadas posteriores usan `route('nombre.ruta', params)` de `ziggy-js`
 | **Gym Plans** | `gym.plans.*`, `gym.plans.exercises(.sync)` | `pages/Gym/Plans/` | `gym.plans.index`, `gym.plans.create`, `gym.plans.edit` |
 | **Gym Registros** | `gym.registros.*`, `gym.registros.last`, `gym.registros.charts` | `pages/Gym/{Registros,Registro,Charts}/` | `gym.registros.index`, `gym.registro`, `gym.charts` |
 
+## Contrato Gym Registros
+
+El tipo efectivo del ejercicio (`exercise.type_ek ?? machine.type_ek`) define las métricas aceptadas por `POST/PUT /api/gym/registros`:
+
+| Tipo | Métricas requeridas | Métricas prohibidas |
+|------|---------------------|---------------------|
+| `R` Repeticiones | `series`, `reps` | `weight`, `duration`, `distance`, `speed`, `incline` |
+| `W` Fuerza | `series`, `reps`, `weight` | `duration`, `distance`, `speed`, `incline` |
+| `D` Distancia | `duration` (minutos), `distance` | `series`, `reps`, `weight` |
+| `T` Tiempo isométrico | `series`, `duration` (segundos) | `reps`, `weight`, `distance`, `speed`, `incline` |
+
+Las métricas por defecto de `GET /api/gym/registros/charts` para `T` son `series` y `duration`.
+
 ## Tiempo real (Reverb)
 
 | Canal backend | Evento | Consumidor frontend |

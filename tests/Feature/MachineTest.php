@@ -107,4 +107,17 @@ class MachineTest extends TestCase
 
         $response->assertStatus(422);
     }
+
+    public function test_admin_can_create_time_machine(): void
+    {
+        $response = $this->actingAs($this->admin, 'api')->postJson('/api/gym/machines', [
+            'name' => 'Banco isométrico',
+            'description' => 'Equipo para aguante',
+            'code' => 'MCH-ISOMETRICO',
+            'type_ek' => 'T',
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('gym_machines', ['code' => 'MCH-ISOMETRICO', 'type_ek' => 'T']);
+    }
 }

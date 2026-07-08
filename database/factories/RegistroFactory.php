@@ -68,6 +68,14 @@ class RegistroFactory extends Factory
     }
 
     /**
+     * Estado de registro de tiempo (isométrico)
+     */
+    public function time(): static
+    {
+        return $this->state(fn (array $attributes) => $this->metricsFor(MachineTypeEk::TIME));
+    }
+
+    /**
      * Generar métricas coherentes con el tipo efectivo indicado
      *
      * @return array<string, mixed>
@@ -95,6 +103,10 @@ class RegistroFactory extends Factory
                 'distance' => fake()->randomFloat(3, 0.5, 20),
                 'speed' => fake()->randomFloat(2, 3, 18),
                 'incline' => fake()->randomFloat(2, 0, 15),
+            ]),
+            MachineTypeEk::TIME => array_merge($empty, [
+                'series' => fake()->numberBetween(1, 6),
+                'duration' => fake()->numberBetween(20, 180),
             ]),
             default => array_merge($empty, [
                 'series' => fake()->numberBetween(1, 6),

@@ -17,6 +17,7 @@ use Notsoweb\LaravelCore\Traits\Enums\Extended;
  * - `REPS`: avance por series y repeticiones (ej. lagartijas, abdominales).
  * - `WEIGHT`: avance por peso levantado, además de series y repeticiones.
  * - `DISTANCE`: avance por duración y distancia (ej. caminadora, bicicleta).
+ * - `TIME`: avance por tiempo isométrico/aguante, con series y duración.
  *
  * @author Moisés Cortés C. <soy@mcortes.dev>
  *
@@ -40,4 +41,9 @@ enum MachineTypeEk: string
      * Ejercicio de distancia (duración + distancia + velocidad/inclinación)
      */
     case DISTANCE = 'D';
+
+    /**
+     * Avance por tiempo (isométricos / aguante), métricas series + duration (segundos)
+     */
+    case TIME = 'T';
 }

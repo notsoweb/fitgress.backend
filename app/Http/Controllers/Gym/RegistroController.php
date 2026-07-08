@@ -208,6 +208,7 @@ class RegistroController extends Controller
         return match ($type) {
             MachineTypeEk::WEIGHT => ['series', 'reps', 'weight'],
             MachineTypeEk::DISTANCE => ['duration', 'distance', 'speed', 'incline'],
+            MachineTypeEk::TIME => ['series', 'duration'],
             default => ['series', 'reps'],
         };
     }

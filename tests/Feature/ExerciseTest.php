@@ -148,4 +148,17 @@ class ExerciseTest extends TestCase
             'type_ek' => 'Z',
         ])->assertStatus(422);
     }
+
+    public function test_admin_can_create_time_exercise(): void
+    {
+        $response = $this->actingAs($this->admin, 'api')->postJson('/api/gym/exercises', [
+            'name' => 'Plancha isométrica',
+            'description' => null,
+            'machine_id' => null,
+            'type_ek' => 'T',
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('gym_exercises', ['name' => 'Plancha isométrica', 'type_ek' => 'T']);
+    }
 }

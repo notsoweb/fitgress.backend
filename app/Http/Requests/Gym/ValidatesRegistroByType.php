@@ -55,6 +55,7 @@ trait ValidatesRegistroByType
             MachineTypeEk::REPS => [['series', 'reps'], ['weight', 'duration', 'distance', 'speed', 'incline']],
             MachineTypeEk::WEIGHT => [['series', 'reps', 'weight'], ['duration', 'distance', 'speed', 'incline']],
             MachineTypeEk::DISTANCE => [['duration', 'distance'], ['series', 'reps', 'weight']],
+            MachineTypeEk::TIME => [['series', 'duration'], ['reps', 'weight', 'distance', 'speed', 'incline']],
             default => [[], []],
         };
 

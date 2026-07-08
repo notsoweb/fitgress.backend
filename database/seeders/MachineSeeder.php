@@ -135,5 +135,21 @@ class MachineSeeder extends Seeder
                 ],
             );
         }
+
+        // Ejercicios isométricos / aguante (series + duración en segundos)
+        $isometric = [
+            'Plancha isométrica',
+        ];
+
+        foreach ($isometric as $name) {
+            Exercise::firstOrCreate(
+                ['name' => $name],
+                [
+                    'machine_id' => null,
+                    'description' => null,
+                    'type_ek' => MachineTypeEk::TIME->value,
+                ],
+            );
+        }
     }
 }

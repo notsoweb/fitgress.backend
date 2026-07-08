@@ -73,13 +73,13 @@ ExerciseNote
 └── belongsTo Exercise
 ```
 
-- `gym_machines`: id, name, description, code (unique), type_ek (string R/W/D).
+- `gym_machines`: id, name, description, code (unique), type_ek (string R/W/D/T).
 - `gym_exercises`: id, machine_id (nullable, nullOnDelete), name, description (nullable), type_ek (string, nullable). Índices en `machine_id` y `name`.
 - `gym_exercise_properties`: id, exercise_id, name, value (nullable), unit (nullable), position. Índice en `(exercise_id, position)`.
 - `gym_exercise_notes`: id, user_id, exercise_id, note (text). Único en `(user_id, exercise_id)`.
 - `gym_plans`: id, name, description.
 - `gym_plan_exercises`: plan_id, exercise_id, position, unique(plan_id, exercise_id).
-- `gym_registros`: id, user_id, exercise_id, plan_id (nullable), series (nullable), reps (nullable), weight (nullable), duration (nullable, min), distance (decimal 8,3, km), speed (decimal 6,2, km/h), incline (decimal 5,2, %), performed_at. Índices en `(user_id, performed_at)` y `exercise_id`.
+- `gym_registros`: id, user_id, exercise_id, plan_id (nullable), series (nullable), reps (nullable), weight (nullable), duration (nullable; minutos para `D`, segundos para `T`), distance (decimal 8,3, km), speed (decimal 6,2, km/h), incline (decimal 5,2, %), performed_at. Índices en `(user_id, performed_at)` y `exercise_id`.
 
 El **tipo efectivo** de un ejercicio es `exercise.type_ek ?? machine.type_ek`; determina qué métricas del registro se validan.
 

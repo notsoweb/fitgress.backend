@@ -19,7 +19,8 @@ Multiusuario: cada usuario ve solo sus propios registros y notas. Máquinas, eje
 |-------|------|--------------------|
 | `R` | Repeticiones | `series`, `reps` |
 | `W` | Fuerza | `series`, `reps`, `weight` |
-| `D` | Distancia | `duration`, `distance` (requeridos); `speed`, `incline` (opcionales) |
+| `D` | Distancia | `duration` (minutos), `distance` (requeridos); `speed`, `incline` (opcionales) |
+| `T` | Tiempo (isométrico) | `series`, `duration` (segundos) |
 
 La validación de registros aplica según el **tipo efectivo** del ejercicio. Los campos que no corresponden al tipo son rechazados si vienen presentes.
 
@@ -27,7 +28,7 @@ La validación de registros aplica según el **tipo efectivo** del ejercicio. Lo
 
 | Archivo | Rol |
 |---------|-----|
-| `app/Emums/MachineTypeEk.php` | Enum `REPS`/`WEIGHT`/`DISTANCE` (string) |
+| `app/Emums/MachineTypeEk.php` | Enum `REPS`/`WEIGHT`/`DISTANCE`/`TIME` (string) |
 | `app/Models/Machine.php` | Equipo (`hasMany` ejercicios) |
 | `app/Models/Exercise.php` | Ejercicio (`effectiveType()`, append `effective_type`) |
 | `app/Models/ExerciseProperty.php`, `ExerciseNote.php` | Propiedades y notas del ejercicio |
@@ -87,7 +88,7 @@ Los registros y las notas NO requieren permiso Spatie: cualquier usuario autenti
 
 ## `effective_type`
 
-El modelo `Exercise` expone el atributo calculado `effective_type` (append) = `type_ek ?? machine?->type_ek` (como cadena `R`/`W`/`D` o `null`). El frontend lo consume directamente; además se serializan `type_ek` y `machine`.
+El modelo `Exercise` expone el atributo calculado `effective_type` (append) = `type_ek ?? machine?->type_ek` (como cadena `R`/`W`/`D`/`T` o `null`). El frontend lo consume directamente; además se serializan `type_ek` y `machine`.
 
 ## Modelo de datos
 
@@ -107,13 +108,13 @@ Plan 1─N Registro (nullable)
 1. `GET /api/gym/plans` → usuario elige un plan.
 2. `GET /api/gym/plans/{plan}/exercises` → ejercicios en orden de ejecución.
 3. Al seleccionar un ejercicio: `GET /api/gym/registros/last?exercise_id=…` → prellena el último registro y muestra la nota.
-4. `POST /api/gym/registros` con los campos del tipo efectivo (`{exercise_id, plan_id, ...métricas, performed_at}`).
+4. `POST /api/gym/registros` con los campos del tipo efectivo (`{exercise_id, plan_id, ...métricas, performed_at}`). Para `D`, `duration` se expresa en minutos; para `T`, en segundos.
 5. `GET /api/gym/registros?exercise_id=…&from=…&to=…` → historial.
 6. `GET /api/gym/registros/charts?exercise_id=…&metric=weight` → serie para gráfica de progreso.
 
 ## Tests
 
-`tests/Feature/ExerciseTest.php`, `ExerciseNoteTest.php`, `MachineTest.php`, `PlanTest.php`, `RegistroTest.php` cubren CRUD, autorización por permiso, scoped multiusuario, `effective_type`, validación por tipo (R/W/D), `last` y notas.
+`tests/Feature/ExerciseTest.php`, `ExerciseNoteTest.php`, `MachineTest.php`, `PlanTest.php`, `RegistroTest.php` cubren CRUD, autorización por permiso, scoped multiusuario, `effective_type`, validación por tipo (R/W/D/T), `last` y notas.
 
 ```
 php artisan test --compact --filter="(ExerciseTest|ExerciseNoteTest|MachineTest|PlanTest|RegistroTest)"
