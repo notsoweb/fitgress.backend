@@ -13,6 +13,7 @@ use App\Http\Requests\Gym\RegistroUpdateRequest;
 use App\Models\Exercise;
 use App\Models\ExerciseNote;
 use App\Models\Registro;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Notsoweb\ApiResponse\Enums\ApiResponse;
@@ -146,6 +147,36 @@ class RegistroController extends Controller
         return ApiResponse::OK->response([
             'model' => $model,
             'note' => $note,
+        ]);
+    }
+
+    /**
+     * Ejercicios del plan que ya tienen registro en la fecha indicada
+     *
+     * Query params:
+     * - `plan_id` (required): plan seleccionado
+     * - `date` (required): día en formato Y-m-d
+     */
+    public function session(Request $request)
+    {
+        $validated = $request->validate([
+            'plan_id' => ['required', 'integer', 'exists:gym_plans,id'],
+            'date' => ['required', 'date_format:Y-m-d'],
+        ]);
+
+        $date = CarbonImmutable::createFromFormat('Y-m-d', $validated['date'])->toDateString();
+
+        $completedExerciseIds = Registro::forUser()
+            ->where('plan_id', $validated['plan_id'])
+            ->whereDate('performed_at', $date)
+            ->distinct()
+            ->orderBy('exercise_id')
+            ->pluck('exercise_id')
+            ->map(fn ($exerciseId) => (int) $exerciseId)
+            ->all();
+
+        return ApiResponse::OK->response([
+            'completed_exercise_ids' => $completedExerciseIds,
         ]);
     }
 

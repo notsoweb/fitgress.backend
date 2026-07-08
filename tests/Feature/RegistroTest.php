@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Exercise;
 use App\Models\ExerciseNote;
 use App\Models\Machine;
+use App\Models\Plan;
 use App\Models\Registro;
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
@@ -263,6 +264,41 @@ class RegistroTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.model', null)
             ->assertJsonPath('data.note', null);
+    }
+
+    public function test_session_returns_only_completed_exercises_for_selected_date_and_user(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->create();
+        /** @var User $other */
+        $other = User::factory()->create();
+        /** @var Plan $plan */
+        $plan = Plan::factory()->create();
+        $completedExercise = Exercise::factory()->weight()->create();
+        $otherDayExercise = Exercise::factory()->weight()->create();
+        $otherUserExercise = Exercise::factory()->weight()->create();
+
+        $plan->exercises()->attach([
+            $completedExercise->id => ['position' => 0],
+            $otherDayExercise->id => ['position' => 1],
+            $otherUserExercise->id => ['position' => 2],
+        ]);
+
+        Registro::factory()->forExercise($completedExercise, $user, $plan)->create([
+            'performed_at' => '2026-07-08 06:30:00',
+        ]);
+        Registro::factory()->forExercise($otherDayExercise, $user, $plan)->create([
+            'performed_at' => '2026-07-07 23:59:59',
+        ]);
+        Registro::factory()->forExercise($otherUserExercise, $other, $plan)->create([
+            'performed_at' => '2026-07-08 08:00:00',
+        ]);
+
+        $response = $this->actingAs($user, 'api')
+            ->getJson("/api/gym/registros/session?plan_id={$plan->id}&date=2026-07-08");
+
+        $response->assertOk()
+            ->assertJsonPath('data.completed_exercise_ids', [$completedExercise->id]);
     }
 
     public function test_charts_returns_time_series_for_metric(): void

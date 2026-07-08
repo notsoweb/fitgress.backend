@@ -67,6 +67,7 @@ Todas requieren `auth:api`. Prefijo `/api/gym`.
 | GET | `/gym/plans/{plan}/exercises` | `gym.plans.exercises` | `plans.index` | Ejercicios ordenados |
 | PUT | `/gym/plans/{plan}/exercises` | `gym.plans.exercises.sync` | `plans.edit` | Sincronizar ejercicios + posición |
 | GET | `/gym/registros/last` | `gym.registros.last` | — | Último registro + nota `{ model, note }` por `exercise_id` |
+| GET | `/gym/registros/session` | `gym.registros.session` | — | Ejercicios completados del usuario para `plan_id` + `date` (`Y-m-d`) |
 | GET | `/gym/registros/charts` | `gym.registros.charts` | — | Serie por `exercise_id` y `metric`; métricas por defecto según tipo |
 | GET | `/gym/registros` | `gym.registros.index` | — | Listado del usuario (filtros `exercise_id`, `plan_id`, `from`, `to`) |
 | POST | `/gym/registros` | `gym.registros.store` | — | Crear (validación por tipo efectivo) |
@@ -74,7 +75,7 @@ Todas requieren `auth:api`. Prefijo `/api/gym`.
 | PUT/PATCH | `/gym/registros/{registro}` | `gym.registros.update` | — | Editar (autorización por `user_id`) |
 | DELETE | `/gym/registros/{registro}` | `gym.registros.destroy` | — | Eliminar (autorización por `user_id`) |
 
-> `registros/last` y `registros/charts` se declaran **antes** de `apiResource('registros')` para evitar colisión con `registros/{registro}`.
+> `registros/last`, `registros/session` y `registros/charts` se declaran **antes** de `apiResource('registros')` para evitar colisión con `registros/{registro}`.
 
 ## Permisos Spatie
 
@@ -105,16 +106,17 @@ Plan 1─N Registro (nullable)
 
 ## Flujo "Modo Registro"
 
-1. `GET /api/gym/plans` → usuario elige un plan.
+1. `GET /api/gym/plans` → usuario elige un plan y una fecha (`Y-m-d`).
 2. `GET /api/gym/plans/{plan}/exercises` → ejercicios en orden de ejecución.
-3. Al seleccionar un ejercicio: `GET /api/gym/registros/last?exercise_id=…` → prellena el último registro y muestra la nota.
-4. `POST /api/gym/registros` con los campos del tipo efectivo (`{exercise_id, plan_id, ...métricas, performed_at}`). Para `D`, `duration` se expresa en minutos; para `T`, en segundos.
-5. `GET /api/gym/registros?exercise_id=…&from=…&to=…` → historial.
-6. `GET /api/gym/registros/charts?exercise_id=…&metric=weight` → serie para gráfica de progreso.
+3. `GET /api/gym/registros/session?plan_id=…&date=YYYY-MM-DD` → `{ completed_exercise_ids: number[] }` con ejercicios que ya tienen ≥1 registro del usuario en esa fecha. La comparación usa solo la parte de fecha de `performed_at`.
+4. Al seleccionar un ejercicio: `GET /api/gym/registros/last?exercise_id=…` → prellena el último registro histórico y muestra la nota; no se limita al día elegido.
+5. `POST /api/gym/registros` con los campos del tipo efectivo (`{exercise_id, plan_id, ...métricas, performed_at}`). Para `D`, `duration` se expresa en minutos; para `T`, en segundos. En Modo Registro el frontend envía `performed_at` alineado a la fecha elegida.
+6. `GET /api/gym/registros?exercise_id=…&from=…&to=…` → historial.
+7. `GET /api/gym/registros/charts?exercise_id=…&metric=weight` → serie para gráfica de progreso.
 
 ## Tests
 
-`tests/Feature/ExerciseTest.php`, `ExerciseNoteTest.php`, `MachineTest.php`, `PlanTest.php`, `RegistroTest.php` cubren CRUD, autorización por permiso, scoped multiusuario, `effective_type`, validación por tipo (R/W/D/T), `last` y notas.
+`tests/Feature/ExerciseTest.php`, `ExerciseNoteTest.php`, `MachineTest.php`, `PlanTest.php`, `RegistroTest.php` cubren CRUD, autorización por permiso, scoped multiusuario, `effective_type`, validación por tipo (R/W/D/T), `last`, `session` por fecha y notas.
 
 ```
 php artisan test --compact --filter="(ExerciseTest|ExerciseNoteTest|MachineTest|PlanTest|RegistroTest)"

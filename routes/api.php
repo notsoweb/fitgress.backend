@@ -40,6 +40,7 @@ Route::middleware('auth:api')->name('gym.')->prefix('gym')->group(function () {
     Route::put('plans/{plan}/exercises', [PlanController::class, 'syncExercises'])->name('plans.exercises.sync');
 
     Route::get('registros/last', [RegistroController::class, 'last'])->name('registros.last');
+    Route::get('registros/session', [RegistroController::class, 'session'])->name('registros.session');
     Route::get('registros/charts', [RegistroController::class, 'charts'])->name('registros.charts');
     Route::apiResource('registros', RegistroController::class);
 });

@@ -63,7 +63,7 @@ Todas las llamadas posteriores usan `route('nombre.ruta', params)` de `ziggy-js`
 | **Gym Machines** | `gym.machines.*` | `pages/Gym/Machines/` | `gym.machines.index`, `gym.machines.create`, `gym.machines.edit` |
 | **Gym Exercises** | `gym.exercises.*`, `gym.exercises.note(.upsert)` | `pages/Gym/Exercises/` | `gym.exercises.index`, `gym.exercises.create`, `gym.exercises.edit` |
 | **Gym Plans** | `gym.plans.*`, `gym.plans.exercises(.sync)` | `pages/Gym/Plans/` | `gym.plans.index`, `gym.plans.create`, `gym.plans.edit` |
-| **Gym Registros** | `gym.registros.*`, `gym.registros.last`, `gym.registros.charts` | `pages/Gym/{Registros,Registro,Charts}/` | `gym.registros.index`, `gym.registro`, `gym.charts` |
+| **Gym Registros** | `gym.registros.*`, `gym.registros.last`, `gym.registros.session`, `gym.registros.charts` | `pages/Gym/{Registros,Registro,Charts}/` | `gym.registros.index`, `gym.registro`, `gym.charts` |
 
 ## Contrato Gym Registros
 
@@ -77,6 +77,8 @@ El tipo efectivo del ejercicio (`exercise.type_ek ?? machine.type_ek`) define la
 | `T` Tiempo isométrico | `series`, `duration` (segundos) | `reps`, `weight`, `distance`, `speed`, `incline` |
 
 Las métricas por defecto de `GET /api/gym/registros/charts` para `T` son `series` y `duration`.
+
+Modo Registro consulta `GET /api/gym/registros/session?plan_id={id}&date=YYYY-MM-DD` al elegir plan o cambiar fecha. La respuesta `{ completed_exercise_ids: number[] }` marca como hechos solo los ejercicios con al menos un registro del usuario autenticado en esa fecha (comparando `performed_at` por día, sin hora). El prellenado del formulario sigue usando `GET /api/gym/registros/last?exercise_id={id}` y puede devolver un registro de cualquier fecha anterior.
 
 ## Tiempo real (Reverb)
 
