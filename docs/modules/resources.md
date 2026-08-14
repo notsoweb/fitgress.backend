@@ -8,7 +8,7 @@ Expone información de la aplicación, el mapa de rutas Ziggy y un endpoint din�
 |---------|-----|
 | `app/Http/Controllers/ResourceController.php` | App info, rutas, recursos dinámicos |
 | `app/Http/Controllers/Resources/UserResource.php` | Ejemplo de recurso (`user:test`) |
-| `app/Http/Controllers/Resources/ExerciseResource.php` | Catálogo de ejercicios (`exercise:all`) |
+| `app/Http/Controllers/Resources/MachineResource.php` | Catálogo de máquinas (`machine:all`) |
 | `app/Http/Controllers/ServerController.php` | Health y versión |
 | `app/Http/Controllers/ChangelogController.php` | Changelog hardcodeado |
 | `app/Models/Setting.php` | Configuración clave/valor |
@@ -42,7 +42,7 @@ Si fallan, la app monta `Errors/503.vue`.
 |---------|----------|
 | `resources.routes` | `window.Ziggy` — todas las llamadas `route()` |
 | `resources.app` | `defineApp()` — versión y metadatos |
-| `resources.get` / `catalogs.get` | `api.resource({ 'exercise:all': {} })` en `Gym/Plans/Edit.vue` (listado completo, sin paginar) |
+| `resources.get` / `catalogs.get` | `api.resource({ 'exercise:all' })` en planes y `api.resource({ 'machine:all' })` en el filtro de ejercicios |
 | `changelogs` | `pages/Changelogs/Core.vue` |
 
 ## Relaciones

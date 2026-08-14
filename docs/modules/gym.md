@@ -36,6 +36,7 @@ La validación de registros aplica según el **tipo efectivo** del ejercicio. Lo
 | `app/Http/Controllers/Gym/MachineController.php` | CRUD equipo (`machines.*`) |
 | `app/Http/Controllers/Gym/ExerciseController.php` | CRUD ejercicios + propiedades (`exercises.*`) |
 | `app/Http/Controllers/Resources/ExerciseResource.php` | Catálogo `exercise:all` (todos los ejercicios, sin paginar) |
+| `app/Http/Controllers/Resources/MachineResource.php` | Catálogo `machine:all` (todas las máquinas, sin paginar) |
 | `app/Http/Controllers/Gym/ExerciseNoteController.php` | Nota por usuario (sin permiso Spatie) |
 | `app/Http/Controllers/Gym/PlanController.php` | CRUD planes + sync ejercicios (`plans.*`) |
 | `app/Http/Controllers/Gym/RegistroController.php` | CRUD registros + `last` + `charts` (scoped a `Auth::user()`) |
@@ -55,7 +56,7 @@ Todas requieren `auth:api`. Prefijo `/api/gym`.
 | GET | `/gym/machines/{machine}` | `gym.machines.show` | `machines.index` | Ver |
 | PUT/PATCH | `/gym/machines/{machine}` | `gym.machines.update` | `machines.edit` | Editar |
 | DELETE | `/gym/machines/{machine}` | `gym.machines.destroy` | `machines.destroy` | Eliminar |
-| GET | `/gym/exercises` | `gym.exercises.index` | `exercises.index` | Listado paginado (con `machine`, `properties`, `effective_type`) |
+| GET | `/gym/exercises` | `gym.exercises.index` | `exercises.index` | Listado paginado. Filtros `machine_id` (id o `none`), `type_ek` (R/W/D/T o `none` = sin tipo efectivo) |
 | POST | `/gym/exercises` | `gym.exercises.store` | `exercises.create` | Crear (`{name, description?, machine_id?, type_ek?, properties[]}`) |
 | GET | `/gym/exercises/{exercise}` | `gym.exercises.show` | `exercises.index` | Ver (con `machine` + `properties`) |
 | PUT/PATCH | `/gym/exercises/{exercise}` | `gym.exercises.update` | `exercises.edit` | Editar |

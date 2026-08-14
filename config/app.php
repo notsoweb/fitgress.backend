@@ -17,7 +17,7 @@ return [
 
     'name' => env('APP_NAME', 'Argos'),
     'slug' => Str::slug(env('APP_NAME', 'argos')),
-    'version' => '0.9.12',
+    'version' => '1.0.0',
 
     /*
     |--------------------------------------------------------------------------
@@ -134,7 +134,6 @@ return [
     /**
      * Otras configuraciones
      */
-
     'pagination' => env('APP_PAGINATION', 25),
     'profile_disk' => env('PROFILE_DISK', 'profile'),
 ];

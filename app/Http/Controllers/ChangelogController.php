@@ -1,16 +1,18 @@
-<?php namespace App\Http\Controllers;
+<?php
+
+namespace App\Http\Controllers;
+
 /**
  * @copyright (c) 2026 MCortesDev (https://mcortes.dev) - All Rights Reserved
  */
 
-use Illuminate\Http\Request;
 use Notsoweb\ApiResponse\Enums\ApiResponse;
 
 /**
  * Controlador de cambios del sistema
- * 
+ *
  * @author Moisés Cortés C. <soy@mcortes.dev>
- * 
+ *
  * @version 1.0.0
  */
 class ChangelogController extends Controller
@@ -35,7 +37,7 @@ class ChangelogController extends Controller
                     'ADD: Backup automático y manual del sistema.',
                     'ADD: Notificación por correo electrónico cuando el backup falla o tiene éxito.',
                     'ADD: Comando para enviar un correo de prueba.',
-                ]
+                ],
             ],
             [
                 'version' => '0.9.11',
@@ -52,6 +54,16 @@ class ChangelogController extends Controller
                     'ADD: Creación de rules y skills para agentes de IA.',
                     'ADD: Integración con codebase memory MCP (para desarrollo).',
                     'UPDATE: Actualización de documentación.',
+                ],
+            ],
+            [
+                'version' => '1.0.0',
+                'date' => '2026-08-13',
+                'changes' => [
+                    'ADD: Dashboard del gimnasio: resumen de máquinas, ejercicios, días de entrenamiento y ejercicio más realizado.',
+                    'ADD: Calendario de días entrenados con el plan ejecutado en cada fecha.',
+                    'ADD: Catálogos dinámicos exercise:all y machine:all (POST /api/catalogs/get).',
+                    'ADD: Filtros de máquina y tipo (incluido sin tipo) en el listado de ejercicios.',
                 ],
             ],
         ]));

@@ -161,4 +161,55 @@ class ExerciseTest extends TestCase
         $response->assertStatus(201);
         $this->assertDatabaseHas('gym_exercises', ['name' => 'Plancha isométrica', 'type_ek' => 'T']);
     }
+
+    public function test_index_filters_by_machine(): void
+    {
+        $machineA = Machine::factory()->reps()->create();
+        $machineB = Machine::factory()->weight()->create();
+        $onA = Exercise::factory()->forMachine($machineA)->create(['name' => 'En máquina A']);
+        Exercise::factory()->forMachine($machineB)->create(['name' => 'En máquina B']);
+
+        $this->actingAs($this->admin, 'api')
+            ->getJson('/api/gym/exercises?machine_id='.$machineA->id)
+            ->assertOk()
+            ->assertJsonCount(1, 'data.models.data')
+            ->assertJsonPath('data.models.data.0.id', $onA->id);
+    }
+
+    public function test_index_filters_exercises_without_machine(): void
+    {
+        Exercise::factory()->forMachine(Machine::factory()->reps()->create())->create();
+        $none = Exercise::factory()->withoutMachine()->reps()->create(['name' => 'Libre']);
+
+        $this->actingAs($this->admin, 'api')
+            ->getJson('/api/gym/exercises?machine_id=none')
+            ->assertOk()
+            ->assertJsonCount(1, 'data.models.data')
+            ->assertJsonPath('data.models.data.0.id', $none->id);
+    }
+
+    public function test_index_filters_by_effective_type(): void
+    {
+        $machine = Machine::factory()->weight()->create();
+        $inherited = Exercise::factory()->forMachine($machine)->create(['name' => 'Hereda W']);
+        Exercise::factory()->reps()->withoutMachine()->create(['name' => 'Solo R']);
+
+        $this->actingAs($this->admin, 'api')
+            ->getJson('/api/gym/exercises?type_ek=W')
+            ->assertOk()
+            ->assertJsonCount(1, 'data.models.data')
+            ->assertJsonPath('data.models.data.0.id', $inherited->id);
+    }
+
+    public function test_index_filters_exercises_without_type(): void
+    {
+        Exercise::factory()->reps()->withoutMachine()->create();
+        $none = Exercise::factory()->withoutMachine()->create(['name' => 'Sin tipo', 'type_ek' => null]);
+
+        $this->actingAs($this->admin, 'api')
+            ->getJson('/api/gym/exercises?type_ek=none')
+            ->assertOk()
+            ->assertJsonCount(1, 'data.models.data')
+            ->assertJsonPath('data.models.data.0.id', $none->id);
+    }
 }

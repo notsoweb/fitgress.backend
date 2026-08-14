@@ -6,11 +6,14 @@ namespace App\Http\Controllers\Gym;
  * @copyright (c) 2026 Mdev (https://mcortes.dev) - All rights reserved.
  */
 
+use App\Emums\MachineTypeEk;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Gym\ExerciseStoreRequest;
 use App\Http\Requests\Gym\ExerciseUpdateRequest;
 use App\Models\Exercise;
 use App\Supports\QuerySupport;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Notsoweb\ApiResponse\Enums\ApiResponse;
 
@@ -40,12 +43,17 @@ class ExerciseController extends Controller implements HasMiddleware
 
     /**
      * Listar ejercicios
+     *
+     * Query params: `q`, `machine_id` (id o `none`), `type_ek` (R/W/D/T o `none`).
+     * `type_ek` filtra por tipo efectivo (propio o heredado de la máquina).
      */
-    public function index()
+    public function index(Request $request)
     {
         $models = Exercise::with(['machine:id,name,code,type_ek', 'properties'])->orderBy('name');
 
         QuerySupport::queryByKeys($models, ['name', 'description', 'machine.name', 'machine.code']);
+
+        $this->applyFilters($models, $request);
 
         return ApiResponse::OK->response([
             'models' => $models->paginate(config('app.pagination')),
@@ -128,5 +136,43 @@ class ExerciseController extends Controller implements HasMiddleware
         ], $properties, array_keys($properties));
 
         $exercise->properties()->createMany($records);
+    }
+
+    /**
+     * Filtros de listado: máquina y tipo efectivo
+     */
+    private function applyFilters(Builder $models, Request $request): void
+    {
+        if ($request->filled('machine_id')) {
+            if ($request->input('machine_id') === 'none') {
+                $models->whereNull('machine_id');
+            } else {
+                $models->where('machine_id', $request->integer('machine_id'));
+            }
+        }
+
+        if (! $request->filled('type_ek')) {
+            return;
+        }
+
+        $type = $request->input('type_ek');
+
+        if ($type === 'none') {
+            $models->whereNull('type_ek')->whereNull('machine_id');
+
+            return;
+        }
+
+        if (! in_array($type, MachineTypeEk::values(), true)) {
+            return;
+        }
+
+        $models->where(function (Builder $query) use ($type) {
+            $query->where('type_ek', $type)
+                ->orWhere(function (Builder $query) use ($type) {
+                    $query->whereNull('type_ek')
+                        ->whereHas('machine', fn (Builder $machine) => $machine->where('type_ek', $type));
+                });
+        });
     }
 }

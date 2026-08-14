@@ -29,7 +29,7 @@ API REST construida con **Laravel 13** sobre el boilerplate **Argos** (`notsoweb
 
 | Campo | Valor |
 |-------|-------|
-| Versión | `0.9.11` (ver `config/app.php`) |
+| Versión | `1.0.0` (ver `config/app.php`) |
 | PHP | 8.5 |
 | Base de datos por defecto | PostgreSQL |
 | Idioma / zona horaria | `es` / `America/Mexico_City` |
