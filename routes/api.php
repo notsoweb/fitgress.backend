@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\Gym\DashboardController;
 use App\Http\Controllers\Gym\ExerciseController;
 use App\Http\Controllers\Gym\ExerciseNoteController;
 use App\Http\Controllers\Gym\MachineController;
 use App\Http\Controllers\Gym\PlanController;
 use App\Http\Controllers\Gym\RegistroController;
+use App\Http\Controllers\ResourceController;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -19,6 +21,13 @@ use Illuminate\Support\Facades\Route;
 include 'core.php';
 
 /**
+ * Alias que espera `api.resource()` de `@notsoweb/vue` (`POST /api/catalogs/get`).
+ */
+Route::middleware('auth:api')->prefix('catalogs')->name('catalogs.')->group(function () {
+    Route::post('get', [ResourceController::class, 'get'])->name('get');
+});
+
+/**
  * Rutas de la aplicación.
  *
  * Estas rutas son de la aplicación API que desarrollarás. Siéntete libre de agregar lo que consideres necesario.
@@ -29,6 +38,8 @@ include 'core.php';
  * @version 1.0.0
  */
 Route::middleware('auth:api')->name('gym.')->prefix('gym')->group(function () {
+    Route::get('dashboard', [DashboardController::class, 'show'])->name('dashboard');
+
     Route::apiResource('machines', MachineController::class);
 
     Route::get('exercises/{exercise}/note', [ExerciseNoteController::class, 'show'])->name('exercises.note');

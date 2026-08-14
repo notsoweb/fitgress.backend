@@ -63,6 +63,8 @@ Todas las llamadas posteriores usan `route('nombre.ruta', params)` de `ziggy-js`
 | **Gym Machines** | `gym.machines.*` | `pages/Gym/Machines/` | `gym.machines.index`, `gym.machines.create`, `gym.machines.edit` |
 | **Gym Exercises** | `gym.exercises.*`, `gym.exercises.note(.upsert)` | `pages/Gym/Exercises/` | `gym.exercises.index`, `gym.exercises.create`, `gym.exercises.edit` |
 | **Gym Plans** | `gym.plans.*`, `gym.plans.exercises(.sync)` | `pages/Gym/Plans/` | `gym.plans.index`, `gym.plans.create`, `gym.plans.edit` |
+| **Gym Dashboard** | `gym.dashboard` | `pages/Dashboard/Index.vue` | `dashboard.index` |
+| **Catálogos** | `catalogs.get`, `resources.get` (`exercise:all`) | `pages/Gym/Plans/Edit.vue` | Selectable de ejercicios sin paginar |
 | **Gym Registros** | `gym.registros.*`, `gym.registros.last`, `gym.registros.session`, `gym.registros.charts` | `pages/Gym/{Registros,Registro,Charts}/` | `gym.registros.index`, `gym.registro`, `gym.charts` |
 
 ## Contrato Gym Registros

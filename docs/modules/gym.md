@@ -35,9 +35,11 @@ La validación de registros aplica según el **tipo efectivo** del ejercicio. Lo
 | `app/Models/Plan.php`, `Registro.php` | Planes y registros (referencian `exercise_id`) |
 | `app/Http/Controllers/Gym/MachineController.php` | CRUD equipo (`machines.*`) |
 | `app/Http/Controllers/Gym/ExerciseController.php` | CRUD ejercicios + propiedades (`exercises.*`) |
+| `app/Http/Controllers/Resources/ExerciseResource.php` | Catálogo `exercise:all` (todos los ejercicios, sin paginar) |
 | `app/Http/Controllers/Gym/ExerciseNoteController.php` | Nota por usuario (sin permiso Spatie) |
 | `app/Http/Controllers/Gym/PlanController.php` | CRUD planes + sync ejercicios (`plans.*`) |
 | `app/Http/Controllers/Gym/RegistroController.php` | CRUD registros + `last` + `charts` (scoped a `Auth::user()`) |
+| `app/Http/Controllers/Gym/DashboardController.php` | Resumen para el dashboard (conteos, ejercicio top y calendario de días/planes) |
 | `app/Http/Requests/Gym/*` | Validación; `ValidatesRegistroByType` centraliza reglas por tipo |
 | `database/seeders/MachineSeeder.php` | Máquinas y ejercicios de ejemplo |
 
@@ -47,6 +49,7 @@ Todas requieren `auth:api`. Prefijo `/api/gym`.
 
 | Método | Ruta | Nombre | Permiso | Descripción |
 |--------|------|--------|---------|-------------|
+| GET | `/gym/dashboard` | `gym.dashboard` | — | Resumen: catálogo, días, ejercicio más realizado y calendario `{ date, plans[] }` |
 | GET | `/gym/machines` | `gym.machines.index` | `machines.index` | Listado paginado |
 | POST | `/gym/machines` | `gym.machines.store` | `machines.create` | Crear |
 | GET | `/gym/machines/{machine}` | `gym.machines.show` | `machines.index` | Ver |
@@ -116,8 +119,8 @@ Plan 1─N Registro (nullable)
 
 ## Tests
 
-`tests/Feature/ExerciseTest.php`, `ExerciseNoteTest.php`, `MachineTest.php`, `PlanTest.php`, `RegistroTest.php` cubren CRUD, autorización por permiso, scoped multiusuario, `effective_type`, validación por tipo (R/W/D/T), `last`, `session` por fecha y notas.
+`tests/Feature/ExerciseTest.php`, `ExerciseNoteTest.php`, `ExerciseResourceTest.php`, `MachineTest.php`, `PlanTest.php`, `RegistroTest.php`, `DashboardTest.php` cubren CRUD, autorización por permiso, scoped multiusuario, `effective_type`, validación por tipo (R/W/D/T), `last`, `session` por fecha, notas, el catálogo `exercise:all` y el resumen del dashboard.
 
 ```
-php artisan test --compact --filter="(ExerciseTest|ExerciseNoteTest|MachineTest|PlanTest|RegistroTest)"
+php artisan test --compact --filter="(ExerciseTest|ExerciseNoteTest|ExerciseResourceTest|MachineTest|PlanTest|RegistroTest|DashboardTest)"
 ```
